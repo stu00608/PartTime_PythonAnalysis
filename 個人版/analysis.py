@@ -1,10 +1,16 @@
 import pandas as pd
 import os
 import ct_tool as ct
-os.getcwd()
 
+#記得路徑不同電腦要改
+os.chdir("C:\\Users\\Naichen\\Documents\\GitHub\\stu00608.github.io\\PartTime_PythonAnalysis\\個人版")
+os.getcwd()
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
+os.chdir("C:\\Users\\Naichen\\Documents\\GitHub\\stu00608.github.io\\PartTime_PythonAnalysis\\個人版\\outputs")
+os.getcwd()
+
+
 
 '''
 ['Submitted', '1. 性別：', '2. 年齡', '3. 最高學歷', '4.\t最高學歷畢業校系',
@@ -34,21 +40,21 @@ statData = statData.dropna(axis=1,how='all')
 cross_tab_gender_to_age = pd.crosstab(statData["2. 年齡"],statData["1. 性別："],margins=True)
 
 #output
-cross_tab_gender_to_age.to_csv('性別to年齡.csv',encoding='utf_8_sig')
+cross_tab_gender_to_age.to_csv('2.性別年齡.csv',encoding='utf_8_sig')
 
 #-----------------------------------------------------------------------------------------------------#
 #最高學歷分析
 
 df1 = statData[['1. 性別：','2. 年齡','3. 最高學歷']].sort_values(by=['1. 性別：']).reset_index(drop=True).rename(columns={'2. 年齡':'年齡',"1. 性別：":'性別','3. 最高學歷':'最高學歷'})
 
-ct1 = ct.crosstab_generator(df1,'最高學歷',"年齡","性別","性別年齡_最高學歷")
+ct1 = ct.crosstab_generator(df1,'最高學歷',"年齡","性別","3.性別年齡_最高學歷")
 
 #-----------------------------------------------------------------------------------------------------#
 #畢業校系-->目前職務
 
 df1 = statData[['1. 性別：','3. 最高學歷','4.\t最高學歷畢業校系','7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','8. 您離開工程職務之最主要原因為何？請勾選最主要原因，至多二項。','(a) 工程與科技領域職務(年)', '(b) 非工程與科技領域職務','10.\t請問您目前服務的職務較接近下列何者？','請問目前受您管理的人員約＿＿人？','9.\t請問您目前的工作狀況為何？']]
 
-ct1 = ct.crosstab_generator(df1,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"性別最高學歷_目前職務")
+#ct1 = ct.crosstab_generator(df1,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"性別最高學歷_目前職務")
 
 #---年資---
 
@@ -101,19 +107,19 @@ for i in range(len(df2)):
 ct2 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(a) 工程與科技領域職務(年)'],df2['1. 性別：']])
 ct3 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(b) 非工程與科技領域職務'],df2['1. 性別：']])
 
-ct2.to_csv('工程領域年資.csv',encoding='utf_8_sig')
-ct3.to_csv('非工程領域年資.csv',encoding='utf_8_sig')
+ct2.to_csv('6.1 工程領域年資.csv',encoding='utf_8_sig')
+ct3.to_csv('6.2 非工程領域年資.csv',encoding='utf_8_sig')
 
 
 #分成國內國外
 
 df2 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國內學校，工程與科技相關領域','國內學校，非工程與科技相關領域'])
 
-ct2 = ct.crosstab_generator(df2,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"性別最高學歷(國內)_目前職務")
+ct2 = ct.crosstab_generator(df2,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"7.1 性別最高學歷(國內)_目前職務")
 
 df3 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國外學校，工程與科技相關領域','國外學校，非工程與科技相關領域'])
 
-ct3 = ct.crosstab_generator(df3,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"性別最高學歷(國外)_目前職務")
+ct3 = ct.crosstab_generator(df3,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"7.2 性別最高學歷(國外)_目前職務")
 
 #分出工程領域畢業但不是從事工程領域職務的資料 取得離開工程職務最主要原因的crosstab
 
@@ -129,13 +135,13 @@ ct4 = pd.crosstab(result['您離開工程職務之最主要原因為何？'],res
 ct4 = ct4.sort_values(by=['女性','男性'],ascending=False)
 
 #output
-ct4.to_csv('離開工程職務最主要原因分析.csv',encoding='utf_8_sig')
+ct4.to_csv('8.離開工程職務最主要原因分析.csv',encoding='utf_8_sig')
 
 
 #最高學歷對目前工作狀況（第七題選否的）
 ct5 = pd.crosstab(df5['9.\t請問您目前的工作狀況為何？'],[df5['3. 最高學歷'],df5['1. 性別：']],margins=True)
 
-ct5.to_csv("目前的工作狀況（第七題選否）.csv",encoding='utf_8_sig')
+ct5.to_csv("9.目前的工作狀況（第七題選否）.csv",encoding='utf_8_sig')
 
 
 df5 = ct.group_table(df1,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','是')
@@ -176,7 +182,7 @@ for i in range(len(df2)):
 
 df3 = pd.crosstab(df2['請問目前受您管理的人員約＿＿人？'],[df2['10.\t請問您目前服務的職務較接近下列何者？'],df2['1. 性別：']])
 
-df3.to_csv('受您管理的人員.csv',encoding='utf_8_sig')
+df3.to_csv('9.1 受您管理的人員.csv',encoding='utf_8_sig')
 
 #-----------------------------------------------------------#
 
@@ -188,13 +194,13 @@ df3 =  ct.extraction(df1,'14.\t您服務的單位或待業前服務的單位提�
 
 ct3 = pd.crosstab(df3['10.\t請問您目前服務的職務較接近下列何者？'],[df3['您服務的單位或待業前服務的單位提供哪些職場相關措施？'],df3['1. 性別：']]).drop(' 請勿再勾選其他選項 )',axis=1)
 
-ct3.to_csv("您服務的單位或待業前服務的單位提供哪些職場相關措施.csv",encoding='utf_8_sig')
+ct3.to_csv("14.您服務的單位或待業前服務的單位提供哪些職場相關措施.csv",encoding='utf_8_sig')
 
 df4 =  ct.extraction(df1,'15.\t您認為工程與科技領域最需要改善的性別議題有哪些？請勾選其中最重要的議題，至多三項。','您認為工程與科技領域最需要改善的性別議題有哪些？')
 
 ct4 = pd.crosstab(df4['10.\t請問您目前服務的職務較接近下列何者？'],[df4['您認為工程與科技領域最需要改善的性別議題有哪些？'],df4['1. 性別：']]).drop(' 請勿再勾選其他選項 )',axis=1)
 
-ct4.to_csv("您認為工程與科技領域最需要改善的性別議題有哪些.csv",encoding='utf_8_sig')
+ct4.to_csv("15.您認為工程與科技領域最需要改善的性別議題有哪些.csv",encoding='utf_8_sig')
 
 
 #-----上面待整理 有夠亂＝＝-----#
@@ -205,7 +211,7 @@ df = statData[['1. 性別：','3. 最高學歷','11.\t您對於現任職務之�
 
 ct1 = pd.crosstab(df['11.\t您對於現任職務之五年後職涯發展的預期為何？請勾選最有可能的一項。'],[df['3. 最高學歷'],df['1. 性別：']],margins=True)
 
-ct1.to_csv('對於現任職務之五年後職涯發展的預期.csv',encoding='utf_8_sig')
+ct1.to_csv('11.對於現任職務之五年後職涯發展的預期.csv',encoding='utf_8_sig')
 
 #第12題
 df = statData[['1. 性別：','3. 最高學歷','12.\t請問您所預期的職涯發展，需要哪些配合因素來達成？請勾選最主要因素，至多二項。']]
@@ -218,7 +224,7 @@ df1 = ct.extraction(df,'12.\t請問您所預期的職涯發展，需要哪些配
 
 ct1 = pd.crosstab(df1['請問您所預期的職涯發展，需要哪些配合因素來達成？'],[df1['3. 最高學歷'],df1['1. 性別：']],margins=True)
 
-ct1.to_csv('預期的職涯發展需要哪些配合因素來達成.csv',encoding='utf_8_sig')
+ct1.to_csv('12.預期的職涯發展需要哪些配合因素來達成.csv',encoding='utf_8_sig')
 
 #第13題
 
@@ -228,7 +234,7 @@ df1 = ct.extraction(df,'13.\t哪些福利措施最有助於您留在工程與科
 
 ct1 = pd.crosstab(df1['哪些福利措施最有助於您留在工程與科技領域就業？'],[df1['3. 最高學歷'],df1['1. 性別：']],margins=True).drop(' 請勿再勾選其他選項 )')
 
-ct1.to_csv('哪些福利措施最有助於您留在工程與科技領域就業.csv',encoding='utf_8_sig')
+ct1.to_csv('13.哪些福利措施最有助於您留在工程與科技領域就業.csv',encoding='utf_8_sig')
 
 #第16題
 df = statData[['1. 性別：','3. 最高學歷','16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？']]
@@ -243,14 +249,48 @@ df = statData[['1. 性別：','3. 最高學歷','16.\t在您或您認識的女�
 
 df1 = ct.group_table(df,"16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？",['有，我有觀察到差異：'])
 
-#insert空資料進去做crosstab
+checkList = ['較用功或成績較好', '較擅長數理學科',
+       '動手實驗或實習的機會較少', '遇到挫折時較易放棄', '較不敢接受挑戰', '較容易情緒起伏', '較受人際問題干擾',
+       '較容易為情所困']
 
+for item in checkList:
+    ct1 = pd.crosstab(df1[item],[df1['3. 最高學歷'],df1['1. 性別：']])
+    filename = '16.'+str(checkList.index(item))+' '+item+'.csv'
+    ct1.to_csv(filename,encoding='utf_8_sig')
 
-#第17題
-df = statData[['1. 性別：','3. 最高學歷','17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？',
+#第17~22題
+df = statData[['1. 性別：','3. 最高學歷',"16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？",
+        '17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？',
        '選擇內勤為主的職務', '選擇無須出差的職務', '選擇無須應酬的職務', '選擇無須輪班或值夜班的職務', '選擇可兼顧家庭的職務',
-       '選擇較有升遷或加薪機會的職務']]
+       '選擇較有升遷或加薪機會的職務','18.\t就您的認知，不同性別在工程與科技領域的求職難易度有否差異？',
+       '19.\t在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異：（複選，同意即打勾）',
+       '20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？',
+       '21.\t您個人比較偏好與何種性別工程與科技領域的主管共事？',
+       '22.\t不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？（可複選至多三項）']]
 
+df0 = ct.group_table(df,"16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？",['有，我有觀察到差異：'])
 
+df1 = ct.group_table(df0,'17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？',['有，我有觀察到差異：'])
 
+checkList = ['選擇內勤為主的職務', '選擇無須出差的職務', '選擇無須應酬的職務', '選擇無須輪班或值夜班的職務', '選擇可兼顧家庭的職務',
+       '選擇較有升遷或加薪機會的職務']
 
+for item in checkList:
+    ct1 = pd.crosstab(df1[item],[df1['3. 最高學歷'],df1['1. 性別：']])
+    filename = '17.'+str(checkList.index(item))+' '+item+'.csv'
+    ct1.to_csv(filename,encoding='utf_8_sig')
+
+ct1 = pd.crosstab(df1['18.\t就您的認知，不同性別在工程與科技領域的求職難易度有否差異？'],[df1['3. 最高學歷'],df1['1. 性別：']])
+ct1.to_csv('18.就您的認知，不同性別在工程與科技領域的求職難易度有否差異.csv',encoding='utf_8_sig')
+
+df2 = ct.extraction(df1,'19.\t在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異：（複選，同意即打勾）','在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異')
+
+ct1 = pd.crosstab(df2['在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異'],[df2['3. 最高學歷'],df2['1. 性別：']]).drop(' 請勿再勾選其他選項 )')
+
+ct1.to_csv('19.就您的認知，不同性別在工程與科技領域的求職難易度有否差異.csv',encoding='utf_8_sig')
+
+ct1 = pd.crosstab(df1['20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？'],[df1['3. 最高學歷'],df1['1. 性別：']])
+ct1.to_csv('20.對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異.csv',encoding='utf_8_sig')
+
+ct1 = pd.crosstab(df1['21.\t您個人比較偏好與何種性別工程與科技領域的主管共事？'],[df1['3. 最高學歷'],df1['1. 性別：']])
+ct1.to_csv('21.您個人比較偏好與何種性別工程與科技領域的主管共事.csv',encoding='utf_8_sig')
