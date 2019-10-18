@@ -3,11 +3,11 @@ import os
 import ct_tool as ct
 
 #記得路徑不同電腦要改
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/個人版")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
 os.getcwd()
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/個人版/outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
 os.getcwd()
 
 
