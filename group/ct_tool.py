@@ -49,3 +49,15 @@ def extraction(statData,title,changeName=None):
     statData = statData.drop(title,axis=1)
 
     return statData.join(t)
+
+def digitCheck(statData,columns):
+    delList = []
+    for j in range(len(statData[columns])):
+        if(not str(statData[columns][j]).isdigit()):
+            if(not delList.count(j)):
+                delList.append(j)
+        else:
+            if(int(statData[columns][j])>100000):
+                if(not delList.count(j)):
+                    delList.append(j)
+    return delList
