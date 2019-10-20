@@ -9,6 +9,9 @@ statData = pd.read_csv("002.csv")
 #statData = statData.dropna(axis=1,how='all')
 
 
+#-------------------------------------------------------------------------#
+
+
 os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/analysis")
 os.getcwd()
 
@@ -65,6 +68,8 @@ result2 = pd.DataFrame(result2,columns=['公路總局'])
 
 result2.to_csv('公路總局.csv',encoding='utf_8_sig')
 
+
+#-------------------------------------------------------------------------#
 
 
 os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/leave")
@@ -123,3 +128,48 @@ for item in doList:
     result2 = result2.rename(columns={'106年 請假人次':'106年男性請假人次','107年  請假人次':'107年男性請假人次','108年 請假人次':'108年男性請假人次','106年  請假人次':'106年女性請假人次','108年  請假人次':'108年女性請假人次'})
 
     result2.to_csv(item+'_請假分析.csv',encoding='utf_8_sig')
+
+#-------------------------------------------------------------------------#
+
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/babycare")
+os.getcwd()
+
+#df = ct.extraction(statData,"3.工程領域").reset_index(drop=True)
+
+df = ct.extraction(statData,'可複選：',"貴單位已實施之福利措施").reset_index(drop=True)
+
+ct1 = pd.crosstab(df["貴單位已實施之福利措施"],df["3.工程領域"]).rename(index={"Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）":"托嬰服務（指設有收托二歲以下兒童之服務機構）"})
+
+ct1.to_csv('貴單位已實施之福利措施.csv',encoding='utf_8_sig')
+
+df1 = ct.group_table(df,"貴單位已實施之福利措施",["哺集乳室"])
+
+df1 = df1[['1.單位名稱','3.工程領域','請問哺集乳室共設有幾處？']].fillna(0).reset_index(drop=True)
+
+delList = []
+for i in range(len(df1['請問哺集乳室共設有幾處？'])):
+    if(not str(df1['請問哺集乳室共設有幾處？'][i]).isdigit()):
+        delList.append(i)
+
+df2 = df1.drop(delList).reset_index(drop=True)
+
+
+for i in range(len(df2['1.單位名稱'])):
+    if( df2['1.單位名稱'][i].find('經濟部水利署') != -1 ):
+        df2.loc[i,'1.單位名稱']='經濟部水利署'
+    elif( df2['1.單位名稱'][i].find('公路總局') != -1 ):
+        df2.loc[i,'1.單位名稱']='公路總局'
+
+doList = ['經濟部水利署','公路總局']
+for item in doList:
+
+    result1 = ct.group_table(df2,'1.單位名稱',[item]).reset_index(drop=True).drop(['1.單位名稱','3.工程領域'],axis=1).fillna(0).astype(int)
+
+    result1 = result1.describe().rename(index={"mean":"平均數","std":"標準差","min":"最小值","max":"最大值","50%":"中位數"}).round(2)
+    
+    result1.name = item
+
+    result1.to_csv(item+'_哺乳室分析.csv',encoding='utf_8_sig')
+
+#-------------------------------------------------------------------------#
+
