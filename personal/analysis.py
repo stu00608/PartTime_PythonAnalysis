@@ -1,14 +1,25 @@
 import pandas as pd
 import os
-import ct_tool as ct
 
-#記得路徑不同電腦要改
 os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
 os.getcwd()
+
+import ct_tool as ct
+
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
 os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
 os.getcwd()
+
+for i in range(len(statData['1. 性別：'])):
+    if(statData['1. 性別：'][i]=='其他'):
+        break
+statData = statData.drop(i).reset_index(drop=True)
+
+for i in range(len(statData['3. 最高學歷'])):
+    if(statData['3. 最高學歷'][i]=='其他（請說明）'):
+        break
+statData = statData.drop(i).reset_index(drop=True)
 
 
 
@@ -58,6 +69,9 @@ df1 = statData[['1. 性別：','3. 最高學歷','4.\t最高學歷畢業校系',
 
 #---年資---
 
+#總年資
+
+
 #數字處理
 delList =[]
 for i in range(len(df1)):
@@ -65,6 +79,11 @@ for i in range(len(df1)):
         delList.append(i)
 
 df2 = df1.drop(delList).reset_index(drop=True)
+
+t1 = df2['(a) 工程與科技領域職務(年)'].fillna(0).astype(int)
+t2 = df2['(b) 非工程與科技領域職務'].fillna(0).astype(int)
+
+df2['總年資']=t1+t2
 
 #用範圍對df2分類
 for i in range(len(df2)):
@@ -103,39 +122,62 @@ for i in range(len(df2)):
         df2['(b) 非工程與科技領域職務'][i]='30年以上'
     else:
         df2['(b) 非工程與科技領域職務'][i]=None
+
+    v1 = int(df2['總年資'][i])
+    if( v1<=5 and v1>=0) :
+        df2['總年資'][i]='0~5年'
+    elif( v1>5 and v1<11 ):
+        df2['總年資'][i]='6~10年'
+    elif( v1>=11 and v1<16 ):
+        df2['總年資'][i]='11~15年'
+    elif( v1>=16 and v1<21 ):
+        df2['總年資'][i]='16~20年'
+    elif( v1>=21 and v1<26 ):
+        df2['總年資'][i]='21~25年'
+    elif( v1>=26 and v1<31 ):
+        df2['總年資'][i]='26~30年'
+    elif( v1>=31 and v1<100 ):
+        df2['總年資'][i]='30年以上'
+    else:
+        df2['總年資'][i]=None
         
+
+
 ct2 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(a) 工程與科技領域職務(年)'],df2['1. 性別：']],margins=True)
+ct2 = ct2/ct2['All'][-1]
+ct2 = ((ct2*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct3 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(b) 非工程與科技領域職務'],df2['1. 性別：']],margins=True)
+ct3 = ct3/ct3['All'][-1]
+ct3 = ((ct3*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct4 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
+ct4 = ct4/ct4['All'][-1]
+ct4 = ((ct4*100).round(1).astype(str)+'%').replace('0.0%','-')
+
 
 ct2.to_csv('6.1 工程領域年資.csv',encoding='utf_8_sig')
 ct3.to_csv('6.2 非工程領域年資.csv',encoding='utf_8_sig')
+ct4.to_csv('6.3 總年資.csv',encoding='utf_8_sig')
 
+#------修改------#
+df1 = statData[['1. 性別：','3. 最高學歷','4.\t最高學歷畢業校系','7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','8. 您離開工程職務之最主要原因為何？請勾選最主要原因，至多二項。','10.\t請問您目前服務的職務較接近下列何者？']]
+df2 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國外學校，非工程與科技相關領域','國內學校，非工程與科技相關領域'])
+df2 = ct.group_table(df2,"10.\t請問您目前服務的職務較接近下列何者？",["非工程與科技領域之管理職務","非工程與科技領域之非管理職務"])
+delList = list(df2.index)
+delList.sort()
+df2 = df1.drop(delList) 
+df2 = df2.reset_index(drop=True)
+df2 = df2.dropna(subset=['8. 您離開工程職務之最主要原因為何？請勾選最主要原因，至多二項。']).reset_index(drop=True)
+df2 = ct.extraction(df2,'8. 您離開工程職務之最主要原因為何？請勾選最主要原因，至多二項。','您離開工程職務之最主要原因為何？').reset_index(drop=True)
+ct2 = pd.crosstab(df2['您離開工程職務之最主要原因為何？'],[df2['3. 最高學歷'],df2['1. 性別：']],margins=True)
+ct2 = ct2[['博士','碩士','大學/大專','專科','高職','All']]
+ct2 = ct2/ct2['All'][-1]
+ct2 = ((ct2*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct2.to_csv('8.離開工程職務最主要原因分析.csv',encoding='utf_8_sig')
+ct3 = pd.crosstab(df2['您離開工程職務之最主要原因為何？'],df2['1. 性別：'],margins=True)
+ct3 = ct3/ct3['All'][-1]
+ct3 = ((ct3*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct3.to_csv('8.離開工程職務最主要原因分析(性別).csv',encoding='utf_8_sig')
 
-#分成國內國外
-
-df2 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國內學校，工程與科技相關領域','國內學校，非工程與科技相關領域'])
-
-ct2 = ct.crosstab_generator(df2,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"7.1 性別最高學歷(國內)_目前職務")
-
-df3 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國外學校，工程與科技相關領域','國外學校，非工程與科技相關領域'])
-
-ct3 = ct.crosstab_generator(df3,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','4.\t最高學歷畢業校系','1. 性別：',"7.2 性別最高學歷(國外)_目前職務")
-
-#分出工程領域畢業但不是從事工程領域職務的資料 取得離開工程職務最主要原因的crosstab
-
-df4 = ct.group_table(df1,"4.\t最高學歷畢業校系",['國內學校，工程與科技相關領域','國外學校，工程與科技相關領域'])
-
-#第七題回答否的資料
-df5 = ct.group_table(df4,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','否')
-
-result = ct.extraction(df5,'8. 您離開工程職務之最主要原因為何？請勾選最主要原因，至多二項。','您離開工程職務之最主要原因為何？')
-
-ct4 = pd.crosstab(result['您離開工程職務之最主要原因為何？'],result['1. 性別：'],margins=True)
-
-ct4 = ct4.sort_values(by=['女性','男性'],ascending=False)
-
-#output
-ct4.to_csv('8.離開工程職務最主要原因分析.csv',encoding='utf_8_sig')
 
 
 #最高學歷對目前工作狀況（第七題選否的）
