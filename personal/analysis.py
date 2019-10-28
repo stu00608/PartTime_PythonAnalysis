@@ -1,14 +1,17 @@
 import pandas as pd
 import os
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
+
 os.getcwd()
 
 import ct_tool as ct
 
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
 os.getcwd()
 
 for i in range(len(statData['1. 性別：'])):
@@ -77,51 +80,12 @@ delList =[]
 for i in range(len(df1)):
     if( (not str(df1['(a) 工程與科技領域職務(年)'][i]).isdigit()) or (not str(df1['(b) 非工程與科技領域職務'][i]).isdigit())) :
         delList.append(i)
-
 df2 = df1.drop(delList).reset_index(drop=True)
-
 t1 = df2['(a) 工程與科技領域職務(年)'].fillna(0).astype(int)
 t2 = df2['(b) 非工程與科技領域職務'].fillna(0).astype(int)
-
 df2['總年資']=t1+t2
-
 #用範圍對df2分類
 for i in range(len(df2)):
-    v1 = int(df2['(a) 工程與科技領域職務(年)'][i])
-    if( v1<=5 and v1>=0) :
-        df2['(a) 工程與科技領域職務(年)'][i]='0~5年'
-    elif( v1>5 and v1<11 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='6~10年'
-    elif( v1>=11 and v1<16 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='11~15年'
-    elif( v1>=16 and v1<21 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='16~20年'
-    elif( v1>=21 and v1<26 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='21~25年'
-    elif( v1>=26 and v1<31 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='26~30年'
-    elif( v1>=31 and v1<100 ):
-        df2['(a) 工程與科技領域職務(年)'][i]='30年以上'
-    else:
-        df2['(a) 工程與科技領域職務(年)'][i]=None
-
-    v1 = int(df2['(b) 非工程與科技領域職務'][i])
-    if( v1<=5 and v1>=0) :
-        df2['(b) 非工程與科技領域職務'][i]='0~5年'
-    elif( v1>5 and v1<11 ):
-        df2['(b) 非工程與科技領域職務'][i]='6~10年'
-    elif( v1>=11 and v1<16 ):
-        df2['(b) 非工程與科技領域職務'][i]='11~15年'
-    elif( v1>=16 and v1<21 ):
-        df2['(b) 非工程與科技領域職務'][i]='16~20年'
-    elif( v1>=21 and v1<26 ):
-        df2['(b) 非工程與科技領域職務'][i]='21~25年'
-    elif( v1>=26 and v1<31 ):
-        df2['(b) 非工程與科技領域職務'][i]='26~30年'
-    elif( v1>=31 and v1<100 ):
-        df2['(b) 非工程與科技領域職務'][i]='30年以上'
-    else:
-        df2['(b) 非工程與科技領域職務'][i]=None
 
     v1 = int(df2['總年資'][i])
     if( v1<=5 and v1>=0) :
@@ -142,20 +106,10 @@ for i in range(len(df2)):
         df2['總年資'][i]=None
         
 
-
-ct2 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(a) 工程與科技領域職務(年)'],df2['1. 性別：']],margins=True)
-ct2 = ct2/ct2['All'][-1]
-ct2 = ((ct2*100).round(1).astype(str)+'%').replace('0.0%','-')
-ct3 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['(b) 非工程與科技領域職務'],df2['1. 性別：']],margins=True)
-ct3 = ct3/ct3['All'][-1]
-ct3 = ((ct3*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct4 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
 ct4 = ct4/ct4['All'][-1]
 ct4 = ((ct4*100).round(1).astype(str)+'%').replace('0.0%','-')
 
-
-ct2.to_csv('6.1 工程領域年資.csv',encoding='utf_8_sig')
-ct3.to_csv('6.2 非工程領域年資.csv',encoding='utf_8_sig')
 ct4.to_csv('6.3 總年資.csv',encoding='utf_8_sig')
 
 #------離開職務分析（修改）------#
@@ -178,13 +132,7 @@ ct3 = ct3/ct3['All'][-1]
 ct3 = ((ct3*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct3.to_csv('8.離開工程職務最主要原因分析(性別).csv',encoding='utf_8_sig')
 
-
-
-#最高學歷對目前工作狀況（第七題選否的）
-ct5 = pd.crosstab(df5['9.\t請問您目前的工作狀況為何？'],[df5['3. 最高學歷'],df5['1. 性別：']],margins=True)
-
-ct5.to_csv("9.目前的工作狀況（第七題選否）.csv",encoding='utf_8_sig')
-
+#--------------#
 
 df5 = ct.group_table(df1,'7. 是否正在從事工程與科技領域職務（含管理與學術研究）？','是')
 
