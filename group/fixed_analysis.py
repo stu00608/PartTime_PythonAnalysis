@@ -2,6 +2,11 @@ import pandas as pd
 import os
 import re
 import numpy as np
+import scipy.stats as stats
+import researchpy as rp
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+import matplotlib.pyplot as plt
 
 #os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
 os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
@@ -929,7 +934,33 @@ for i in range(len(statData)):
     else:
         statData.loc[i,'2.單位總員工人數']=None
 
+#---ANOVA---#
 
+def anova_table(aov):
+    aov['mean_sq'] = aov[:]['sum_sq']/aov[:]['df']
+    
+    aov['eta_sq'] = aov[:-1]['sum_sq']/sum(aov['sum_sq'])
+    
+    aov['omega_sq'] = (aov[:-1]['sum_sq']-(aov[:-1]['df']*aov['mean_sq'][-1]))/(sum(aov['sum_sq'])+aov['mean_sq'][-1])
+    
+    cols = ['sum_sq', 'df', 'mean_sq', 'F', 'PR(>F)', 'eta_sq', 'omega_sq']
+    aov = aov[cols]
+    return aov
+
+df = statData[['2.單位總員工人數','土木營建領域專長 男性 專任 人數']]
+df.columns = ['total','member']
+
+rp.summary_cont(df['member'].groupby(df['total']))
+
+stats.f_oneway(df['member'][df['total'] == num[0]], 
+             df['member'][df['total'] == num[1]],
+             df['member'][df['total'] == num[2]])
+
+results = ols('member ~ C(total)', data=df).fit()
+
+aov_table = sm.stats.anova_lm(results, typ=2)
+
+anova_table(aov_table)
 
 #---main---#
 
@@ -950,10 +981,6 @@ colname3 = [ ['各領域女性佔比','各領域女性佔比','各領域女性�
 
 theme = ['土木營建','建築、都市規劃','電子電機','資訊通訊','化工材料','生技醫工','環工綠能','機械','其他','非工程領域']
 
-#放所有個別輸出資料
-seniority = []
-management_seniority = []
-management = []
 
 #All
 
@@ -993,8 +1020,11 @@ girl.columns = theme
 member = (boy+girl).astype(int)
 girlRate = (girl/member)*100
 girlRate = girlRate.fillna(0)
+temp = (girl/member).fillna(0)
 girlRate = girlRate.round(1).astype(str) + '%'
 result1 = pd.concat([girlRate,member],axis=1)
+temp = pd.concat([temp,member],axis=1)
+member_analysis_n = temp
 result1.columns = colname3
 result1.columns.names = ['','']
 member_analysis = result1.copy()
@@ -1082,9 +1112,13 @@ themeList = [ ['1.單位名稱','2.單位總員工人數', #0
             
             ]
 
+#放所有個別輸出資料
 seniority = []
+seniority_n = []
 management_seniority = []
+management_seniority_n = []
 management = []
+management_n = []
 
 
 for i in range(9):
@@ -1125,10 +1159,14 @@ for i in range(9):
     girl.columns = ['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']
     member = (boy+girl).astype(int)
     #女性佔比
+    temp = (girl/member).fillna(0)
     girlRate = (girl/member)*100
     girlRate = girlRate.fillna(0)
+    temp = (girl/member).fillna(0)
     girlRate = girlRate.round(1).astype(str) + '%'
     result1 = pd.concat([girlRate,member],axis=1)
+    temp = pd.concat([temp,member],axis=1)
+    seniority_n.append(temp)
     result1.columns = colname
     result1.columns.names = [theme[i],'服務年資'] #i
     seniority.append(result1)
@@ -1143,8 +1181,11 @@ for i in range(9):
     #女性佔比
     girlRate = (girl/member)*100
     girlRate = girlRate.fillna(0)
+    temp = (girl/member).fillna(0)
     girlRate = girlRate.round(1).astype(str) + '%'
     result2 = pd.concat([girlRate,member],axis=1)
+    temp = pd.concat([temp,member],axis=1)
+    management_seniority_n.append(temp)
     result2.columns = colname
     result2.columns.names = [theme[i],'管理職服務年資'] #i
     management_seniority.append(result2)
@@ -1159,6 +1200,7 @@ for i in range(9):
     temp.append(result[target[20:30]].astype(int)) 
     member = []
     girlRate = []
+    girlRate_n = []
 
     for df in temp:
         boy = df[df.columns[:5]]
@@ -1168,11 +1210,14 @@ for i in range(9):
         member.append(boy+girl)
         df1 = (girl/(boy+girl))*100
         df1 = df1.fillna(0)
+        temp = (girl/(boy+girl)).fillna(0)
+        girlRate_n.append(temp)
         df1 = df1.round(1).astype(str) + '%'
         girlRate.append(df1)
 
     result3 = pd.concat([girlRate[0],girlRate[1],girlRate[2],member[0],member[1],member[2]],axis=1)
-
+    temp = pd.concat([girlRate_n[0],girlRate_n[1],girlRate_n[2],member[0],member[1],member[2]],axis=1)
+    management_n.append(temp)
     result3.columns = colname2
     result3.columns.names = [theme[i],'階層','年齡'] #i
     management.append(result3)
