@@ -270,11 +270,130 @@ ct1.columns.name='性別'
 resultCSV.append(ct1)
 # ct1.to_csv("12.您認為工程與科技領域最需要改善的性別議題有哪些.csv",encoding='utf_8_sig')
 
+#性別在工程與科技領域的求學階段有否差異
+
+#16
+df = statData.dropna(subset=['16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？'])
+ct1 = pd.crosstab(df['16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？'],df['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計','有，我有觀察到差異：':'有，我有觀察到差異'},columns={'All':'小計'})
+ct1.index.name = '在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？'
+ct1.columns.name = '性別'
+resultCSV.append(ct1)
+
+df = ct.group_table(statData,'16.\t在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？',['有，我有觀察到差異：'])
+title = ['較用功或成績較好', '較擅長數理學科','動手實驗或實習的機會較少', '遇到挫折時較易放棄', '較不敢接受挑戰', '較容易情緒起伏', '較受人際問題干擾','較容易為情所困']
+col = [ sorted(title*3),['女性','男性','小計']*len(title) ]
+df1 = df[['1. 性別：']+title].reset_index(drop=True)
+ct2 = []
+for i in range(len(title)):
+    ct2.append( pd.crosstab(df[title[i]],df1['1. 性別：'],margins=True) )
+    ct2[i] = ct2[i]/ct2[i]['All'][-1]
+    ct2[i] = ((ct2[i]*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct2 = pd.concat(ct2,axis=1)
+ct2.columns=col
+ct2 = ct2.rename(index={'All':'合計'})
+ct2.index.name = '在您或您認識的女性身上，性別在工程與科技領域的求學階段有否差異？'
+resultCSV.append(ct2)
+
+#17
+df = statData.dropna(subset=['17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？'])
+ct1 = pd.crosstab(df['17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？'],df['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計','有，我有觀察到差異：':'有，我有觀察到差異'},columns={'All':'小計'})
+ct1.index.name = '在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？'
+ct1.columns.name = '性別'
+resultCSV.append(ct1)
+
+df = ct.group_table(statData,'17.\t在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？',['有，我有觀察到差異：'])
+title = ['選擇內勤為主的職務', '選擇無須出差的職務', '選擇無須應酬的職務', '選擇無須輪班或值夜班的職務', '選擇可兼顧家庭的職務','選擇較有升遷或加薪機會的職務']
+col = [ sorted(title*3),['女性','男性','小計']*len(title) ]
+df1 = df[['1. 性別：']+title].reset_index(drop=True)
+ct2 = []
+for i in range(len(title)):
+    ct2.append( pd.crosstab(df[title[i]],df1['1. 性別：'],margins=True) )
+    ct2[i] = ct2[i]/ct2[i]['All'][-1]
+    ct2[i] = ((ct2[i]*100).round(1).astype(str)+'%').replace('0.0%','-')
+#以後再修
+ct2[3]=ct.Insert_row(2,ct2[3],['-','-','-'])
+ct2[3].index=['女性較有此傾向', '無差異', '男性較有此傾向', 'All']
+
+ct2 = pd.concat(ct2,axis=1)
+ct2.columns=col
+ct2 = ct2.rename(index={'All':'合計'})
+ct2.index.name = '在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？'
+resultCSV.append(ct2)
+
+#18~22
+df = df[['1. 性別：','18.\t就您的認知，不同性別在工程與科技領域的求職難易度有否差異？',
+    '19.\t在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異：（複選，同意即打勾）',
+    '20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？',
+    '21.\t您個人比較偏好與何種性別工程與科技領域的主管共事？',
+    '22.\t不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？（可複選至多三項）']].reset_index(drop=True)
+
+ct1 = pd.crosstab(df['18.\t就您的認知，不同性別在工程與科技領域的求職難易度有否差異？'],df['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計'},columns={'All':'小計'})
+ct1.index.name = '不同性別在工程與科技領域的求職難易度有否差異？'
+ct1.columns.name = '性別'
+resultCSV.append(ct1)
+
+df1 = ct.extraction(df,'19.\t在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異：（複選，同意即打勾）','19.在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異').reset_index(drop=True)
+ct1 = pd.crosstab(df1['19.在您或您認識的女性身上，性別在工程與科技領域的就業過程中存在的差異'],df1['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計','其他，':'其他','沒有差異  ( 若選此項':'沒有差異','沒有接觸經驗，無法回答  ( 若選此項':'沒有接觸經驗，無法回答'},columns={'All':'小計'})
+ct1 = ct1.drop([' 請勿再勾選其他選項 )'],axis=0)
+ct1.index.name = '在您或您認識的工程與科技領域女性身上，性別在求職時的職務選擇方面有否差異？'
+ct1.columns.name = '性別'
+temp = list(ct1.index)
+temp.insert(11,temp[0])
+temp = temp[1:]
+ct1 = ct1.reindex(index=temp)
+resultCSV.append(ct1)
+
+df1 = df.dropna(subset=['20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？'])
+ct1 = pd.crosstab(df1['20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？'],df1['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計'},columns={'All':'小計'})
+ct1.index.name = '對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異？'
+ct1.columns.name = '性別'
+resultCSV.append(ct1)
+
+df1 = ct.group_table(df,'20.\t對您的經驗，不同性別的工程與科技領域主管是否有領導風格的差異（指非因個人而是因為性別所致之差異）？',['是，有差異'])
+ct1 = pd.crosstab(df1['21.\t您個人比較偏好與何種性別工程與科技領域的主管共事？'],df1['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計'},columns={'All':'小計'})
+ct1.index.name = '您個人比較偏好與何種性別工程與科技領域的主管共事？'
+ct1.columns.name = '性別'
+ct1 = ct1.reindex(index=['女性', '男性','無性別偏好' ,'合計'])
+resultCSV.append(ct1)
+
+df2 = ct.extraction(df1,'22.\t不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？（可複選至多三項）','22.\t不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？').reset_index(drop=True)
+ct1 = pd.crosstab(df2['22.\t不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？'],df2['1. 性別：'],margins=True)
+ct1 = ct1/ct1['All'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.rename(index={'All':'合計'},columns={'All':'小計'})
+ct1.index.name = '不同性別工程與科技領域的主管領導風格差異主要顯現在哪些層面？'
+ct1.columns.name = '性別'
+temp = list(ct1.index)
+temp.insert(15,temp[0])
+temp = temp[1:]
+ct1 = ct1.reindex(index=temp)
+resultCSV.append(ct1)
+
 #---------------------------------------------------------------------------------------#
 
 name = ['年齡','年齡(比例)','學歷','最高學歷','總年資','離開工程職務最主要原因分析','目前工作狀況','對於現任職務之五年後職涯發展的預期','預期的職涯發展需要哪些配合因素來達成',
-        '預期的職涯發展需要哪些配合因素來達成','哪些福利措施最有助於您留在工程與科技領域就業','哪些福利措施最有助於您留在工程與科技領域就業(性別)','您服務的單位或待業前服務的單位提供哪些職場相關措施',
-        '您認為工程與科技領域最需要改善的性別議題有哪些']
+        '預期的職涯發展需要哪些配合因素來達成(性別)','哪些福利措施最有助於您留在工程與科技領域就業','哪些福利措施最有助於您留在工程與科技領域就業(性別)','您服務的單位或待業前服務的單位提供哪些職場相關措施',
+        '您認為工程與科技領域最需要改善的性別議題有哪些','女性身上求學階段有否差異(性別)','女性身上求學階段有否差異','工程與科技領域女性身上職務選擇有否差異(性別)','工程與科技領域女性身上職務選擇有否差異',
+        '不同性別在工程與科技領域的求職難易度有否差異(性別)','性別在求職時的職務選擇方面有否差異','不同性別的工程與科技領域主管是否有領導風格的差異(性別)','您個人比較偏好與何種性別工程與科技領域的主管共事(性別)',
+        '不同性別工程與科技領域的主管領導風格差異主要在哪些層面(性別)']
 
 with pd.ExcelWriter('個人版分析.xlsx') as writer:
     for i in range(len(name)):
