@@ -32,9 +32,13 @@ resultCSV = []
 
 #性別
 ct1 = pd.crosstab(statData["2. 年齡"],statData["1. 性別："],margins=True)
-ct1 = ct1.rename(columns={'All':'小計'},index={'All':'合計'})
-ct1.columns.name = "性別"
+ct1 = ct1.rename(columns={'All':'總人數'},index={'All':'各年齡小計'})
+ct1.columns.name = ""
 ct1.index.name = "年齡"
+
+ct1['女性占比'] = (((ct1['女性']/ct1['總人數'])*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct1 = ct1.drop(['男性','女性'],axis=1)
+ct1 = ct1.reindex(columns=['女性占比','總人數'])
 
 ct2 = ct1/ct1['小計'][-1]
 ct2 = ((ct2*100).round(1).astype(str)+'%').replace('0.0%','-')
@@ -87,6 +91,8 @@ t1 = df2['(a) 工程與科技領域職務(年)'].fillna(0).astype(int)
 t2 = df2['(b) 非工程與科技領域職務'].fillna(0).astype(int)
 df2['總年資']=t1+t2
 
+year = ['0~5年','6~10年','11~15年','16~20年','21~25年','26~30年','30年以上']
+
 ##     用範圍對df2分類
 for i in range(len(df2)):
 
@@ -107,8 +113,41 @@ for i in range(len(df2)):
         df2.loc[i,'總年資']='30年以上'
     else:
         df2.loc[i,'總年資']=None
-        
-ct1 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
+
+col = ['各年資小計']+year 
+
+ct1 = pd.crosstab(df2['4.\t最高學歷畢業校系'],df2['總年資'],margins=True)
+ct2 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
+
+ct3 = pd.DataFrame(columns=col,index=list(ct1.index))
+ct4 = pd.DataFrame(columns=col,index=list(ct1.index))
+
+girl_sum = ct2[year[0]]['女性']
+for i in range(1,len(year)):
+    girl_sum += ct2[year[i]]['女性']
+
+
+for i in range(len(year)):
+    temp = ct2[year[i]]['女性']/ct1[year[i]]*100
+    r1 = ((temp).round(1).astype(str)+'%').replace('0.0%','-')
+    r2 = ct1[year[i]]
+    ct3[year[i]] = r1
+    ct4[year[i]] = r2
+
+temp = girl_sum/ct2['All']*100
+ct3['各年資小計'] = ((temp).round(1).astype(str)+'%').replace('0.0%','-')
+ct4['各年資小計'] = ct2['All']
+
+col = [ ['各年資小計','各年資小計','0~5年','0~5年','6~10年','6~10年','11~15年','11~15年','16~20年','16~20年','21~25年',
+  '21~25年','26~30年','26~30年','30年以上','30年以上'],['女性占比','總人數']*(len(year)+1) ]
+
+ct1 = pd.DataFrame(index=list(ct3.index))
+
+for i in range(len(year)):
+    ct1['女性占比'+str(i)]=ct3[year[i]]
+    ct1['總人數'+str(i)]=ct4[year[i]]
+
+
 ct1 = ct1/ct1['All'][-1]
 ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct1.columns.names=["總年資","性別"]
