@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
 
 os.getcwd()
 
@@ -10,8 +10,8 @@ import ct_tool as ct
 
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
 os.getcwd()
 
 #把性別跟學歷的"其他"刪除
@@ -40,11 +40,7 @@ ct1['女性占比'] = (((ct1['女性']/ct1['總人數'])*100).round(1).astype(st
 ct1 = ct1.drop(['男性','女性'],axis=1)
 ct1 = ct1.reindex(columns=['女性占比','總人數'])
 
-ct2 = ct1/ct1['小計'][-1]
-ct2 = ((ct2*100).round(1).astype(str)+'%').replace('0.0%','-')
-
 resultCSV.append(ct1)
-resultCSV.append(ct2)
 
 # ct1.to_csv('1.年齡.csv',encoding='utf_8_sig')
 # ct2.to_csv('1.年齡(比例).csv',encoding='utf_8_sig')
@@ -65,15 +61,20 @@ resultCSV.append(ct1)
 # ct1.to_csv('2.學歷.csv',encoding='utf_8_sig')
 
 #畢業校系
+
+col = [ sorted(['工程與科技相關領域','非工程與科技相關領域']*4)+[''] , sorted(['國內學校','國外學校']*2)*2+[''] , ['女性','男性']*4+['小計']  ]
+
 ct1 = pd.crosstab(statData['7. 是否正在從事工程與科技領域職務（含管理與學術研究）？'],[statData['4.\t最高學歷畢業校系'],statData['1. 性別：']],margins=True)
-ct1 = ct1/ct1['All'][-1]
-ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+#ct1 = ct1/ct1['All'][-1]
+#ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct1 = ct1.drop('All')
 ct1 = ct1.reindex(['是','否'])
 ct1 = ct1.rename(columns={'All':'小計'},index={'是':'工程與科技職務','否':'非工程與科技職務'})
 ct1.columns.names=["最高學歷","性別"]
 ct1.index.name = ""
-
+ct1 = ct1.reindex(columns=[['國內學校，工程與科技相關領域','國內學校，工程與科技相關領域','國外學校，工程與科技相關領域','國外學校，工程與科技相關領域',
+'國內學校，非工程與科技相關領域','國內學校，非工程與科技相關領域','國外學校，非工程與科技相關領域','國外學校，非工程與科技相關領域','小計'],['女性','男性']*4+['']])
+ct1.columns = col
 
 resultCSV.append(ct1)
 # ct1.to_csv('3.最高學歷.csv',encoding='utf_8_sig')
@@ -114,45 +115,34 @@ for i in range(len(df2)):
     else:
         df2.loc[i,'總年資']=None
 
-col = ['各年資小計']+year 
-
-ct1 = pd.crosstab(df2['4.\t最高學歷畢業校系'],df2['總年資'],margins=True)
-ct2 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
-
-ct3 = pd.DataFrame(columns=col,index=list(ct1.index))
-ct4 = pd.DataFrame(columns=col,index=list(ct1.index))
-
-girl_sum = ct2[year[0]]['女性']
-for i in range(1,len(year)):
-    girl_sum += ct2[year[i]]['女性']
-
-
-for i in range(len(year)):
-    temp = ct2[year[i]]['女性']/ct1[year[i]]*100
-    r1 = ((temp).round(1).astype(str)+'%').replace('0.0%','-')
-    r2 = ct1[year[i]]
-    ct3[year[i]] = r1
-    ct4[year[i]] = r2
-
-temp = girl_sum/ct2['All']*100
-ct3['各年資小計'] = ((temp).round(1).astype(str)+'%').replace('0.0%','-')
-ct4['各年資小計'] = ct2['All']
-
 col = [ ['各年資小計','各年資小計','0~5年','0~5年','6~10年','6~10年','11~15年','11~15年','16~20年','16~20年','21~25年',
-  '21~25年','26~30年','26~30年','30年以上','30年以上'],['女性占比','總人數']*(len(year)+1) ]
+  '21~25年','26~30年','26~30年','30年以上','30年以上'],['女性占比','總人數']+['女性','男性']*(len(year)) ]
 
-ct1 = pd.DataFrame(index=list(ct3.index))
-
-for i in range(len(year)):
-    ct1['女性占比'+str(i)]=ct3[year[i]]
-    ct1['總人數'+str(i)]=ct4[year[i]]
+index = [ sorted(['工程與科技相關領域','非工程與科技相關領域']*2)+[''] , sorted(['國內學校','國外學校'])*2+['合計']  ] 
 
 
-ct1 = ct1/ct1['All'][-1]
-ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
-ct1.columns.names=["總年資","性別"]
-ct1.index.name="最高學歷"
-ct1 = ct1.rename(columns={'All':'小計'},index={'All':'合計'})
+ct1 = pd.crosstab(df2['4.\t最高學歷畢業校系'],[df2['總年資'],df2['1. 性別：']],margins=True)
+ct2 = pd.DataFrame(index=list(ct1.index))
+
+girl_sum = ct1[year[0]]['女性']
+for i in range(1,len(year)):
+    girl_sum += ct1[year[i]]['女性']
+
+rate = girl_sum/ct1['All']
+ct2['女性占比']=((rate*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct2['總人數All'] = ct1['All']
+
+ct1 = pd.concat([ct2,ct1],axis=1)
+ct1 = ct1.drop(('All', ''),axis=1)
+
+ct1.columns = col
+ct1.index = index
+
+ct1.index.name="最高學歷畢業校系"
+ct1 = ct1.rename(index={'All':'合計'})
+#temp = list(ct1.index)
+#ct1 = ct1.reindex(index=['合計']+temp[:-1])
+
 
 resultCSV.append(ct1)
 # ct1.to_csv('4.總年資.csv',encoding='utf_8_sig')
@@ -209,12 +199,41 @@ resultCSV.append(ct1)
 
 #五年後
 
+temp = ['博士','碩士','大學/大專','專科','高職']
+col = [ ['不分學歷小計','不分學歷小計','博士','博士','碩士','碩士','大學/大專','大學/大專','專科','專科','高職','高職'],['女性占比','總人數']+['女性','男性']*5 ]
+col2 = [ ['不分學歷小計','不分學歷小計'],['女性占比','總人數'] ]
+col3 = [ i for i in range(len(temp)*2+1) ]
+col4 = [ ['博士','博士','碩士','碩士','大學/大專','大學/大專','專科','專科','高職','高職'],['女性','男性']*len(temp) ]
 df = statData[['1. 性別：','3. 最高學歷','11.\t您對於現任職務之五年後職涯發展的預期為何？請勾選最有可能的一項。']]
 
 ct1 = pd.crosstab(df['11.\t您對於現任職務之五年後職涯發展的預期為何？請勾選最有可能的一項。'],[df['3. 最高學歷'],df['1. 性別：']],margins=True)
-ct1 = ct1/ct1['All'][-1]
-ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+#ct1 = ct1/ct1['All'][-1]
+#ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
 ct1 = ct1[['博士','碩士','大學/大專','專科','高職','All']]
+
+girl_sum = ct1[temp[0]]['女性']
+for i in range(1,len(temp)):
+    girl_sum += ct1[temp[i]]['女性']
+
+ct2 = pd.DataFrame(columns=['女性占比','總人數'],index = list(ct1.index))
+
+rate = girl_sum/ct1['All']
+ct2['女性占比'] = ((rate*100).round(1).astype(str)+'%').replace('0.0%','-')
+ct2['總人數'] = ct1['All']
+ct2.columns = col2
+
+ct1.columns = col3
+for i in range(len(temp)*2):
+    for j in range(len(ct1[i])):
+        ct1.loc[j,i] = ct1.loc[j,i]/ct1.loc['All',i]
+ct1.columns = col4
+
+ct1 = pd.concat([ct1,ct2],axis=1)
+ct1 = ct1.drop(['All'],axis=1)
+ct1 = ct1.reindex(columns=col)
+        
+
+ct1.columns = col
 ct1.columns.names=['最高學歷','性別']
 ct1.index.name="現任職務之五年後職涯發展的預期"
 ct1 = ct1.rename(index={'轉換領域(轉至非工程與科技領域或轉入工程與科技領域)   (請說明原因)':'轉換領域(轉至非工程與科技領域或轉入工程與科技領域)','離職 (請說明原因)':'離職','All':'合計'},columns={'All':'小計'})
@@ -428,7 +447,7 @@ resultCSV.append(ct1)
 
 #---------------------------------------------------------------------------------------#
 
-name = ['年齡','年齡(比例)','學歷','最高學歷','總年資','離開工程職務最主要原因分析','目前工作狀況','對於現任職務之五年後職涯發展的預期','預期的職涯發展需要哪些配合因素來達成',
+name = ['年齡','學歷','最高學歷','總年資','離開工程職務最主要原因分析','目前工作狀況','對於現任職務之五年後職涯發展的預期','預期的職涯發展需要哪些配合因素來達成',
         '預期的職涯發展需要哪些配合因素來達成(性別)','哪些福利措施最有助於您留在工程與科技領域就業','哪些福利措施最有助於您留在工程與科技領域就業(性別)','您服務的單位或待業前服務的單位提供哪些職場相關措施',
         '您認為工程與科技領域最需要改善的性別議題有哪些','女性身上求學階段有否差異(性別)','女性身上求學階段有否差異','工程與科技領域女性身上職務選擇有否差異(性別)','工程與科技領域女性身上職務選擇有否差異',
         '不同性別在工程與科技領域的求職難易度有否差異(性別)','性別在求職時的職務選擇方面有否差異','不同性別的工程與科技領域主管是否有領導風格的差異(性別)','您個人比較偏好與何種性別工程與科技領域的主管共事(性別)',
