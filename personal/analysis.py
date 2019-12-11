@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
 
 os.getcwd()
 
@@ -10,8 +10,8 @@ import ct_tool as ct
 
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
 os.getcwd()
 
 #把性別跟學歷的"其他"刪除
@@ -44,6 +44,46 @@ resultCSV.append(ct1)
 
 # ct1.to_csv('1.年齡.csv',encoding='utf_8_sig')
 # ct2.to_csv('1.年齡(比例).csv',encoding='utf_8_sig')
+
+
+#最高學歷
+
+df1 = statData[['1. 性別：','2. 年齡','3. 最高學歷']].sort_values(by=['1. 性別：']).reset_index(drop=True).rename(columns={'2. 年齡':'年齡',"1. 性別：":'性別','3. 最高學歷':'最高學歷'})
+
+ct1 = pd.crosstab(statData['2. 年齡'],[statData['3. 最高學歷'],statData["1. 性別："]],margins=True)
+
+#獨立
+result = pd.DataFrame(index=list(ct1.index))
+girl_sum = pd.DataFrame(index=list(ct1.index))
+girl_sum['All'] = [0]*len(list(ct1.index)) 
+for i in ['博士','碩士','大學/大專','專科','高職']:
+    girl_sum['All'] += ct1[i]['女性']
+    girlRate = ct1[i]['女性']/(ct1[i]['女性']+ct1[i]['男性'])
+    girlRate = girlRate.fillna(0)
+    result[i+'0'] = ((girlRate*100).round(1).astype(str)+'%').replace('0.0%','-')
+    result[i+'1'] = ct1[i]['女性']+ct1[i]['男性']
+
+girlRate = girl_sum['All']/ct1['All']
+
+girlRate = girlRate.fillna(0)
+result['合計0'] = ((girlRate*100).round(1).astype(str)+'%').replace('0.0%','-')
+result['合計1'] = ct1['All']
+
+result = result.reindex(columns=['博士0','博士1','合計0','合計1','大學/大專0','大學/大專1','專科0','專科1','碩士0','碩士1','高職0','高職1'])
+
+result.columns = [ sorted(['博士','碩士','大學/大專','專科','高職','合計']*2),['女性佔比','總人數']*6 ]
+
+result = result[['合計','博士','碩士','大學/大專','專科','高職']]
+
+ct1 = ct1.rename(index={'All':'各年齡合計'})
+ct1.columns.names=["年齡","性別"]
+ct1.index.name = "最高學歷"
+ct1 = ct1.reindex(['博士','碩士','大學/大專','專科','高職','合計'])
+ct1 = ct1/ct1['小計'][-1]
+ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
+
+resultCSV.append(ct1)
+# ct1.to_csv('2.學歷.csv',encoding='utf_8_sig')
 
 #畢業校系O
 
@@ -453,7 +493,7 @@ resultCSV.append(ct1)
 
 #---------------------------------------------------------------------------------------#
 
-name = ['年齡','最高學歷','最高學歷(比例)','總年資','總年資(比例)','離開工程職務最主要原因分析','目前工作狀況','對於現任職務之五年後職涯發展的預期','對於現任職務之五年後職涯發展的預期(比例)','預期的職涯發展需要哪些配合因素來達成',
+name = ['年齡','最高學歷','最高畢業','最高畢業(比例)','總年資','總年資(比例)','離開工程職務最主要原因分析','目前工作狀況','對於現任職務之五年後職涯發展的預期','對於現任職務之五年後職涯發展的預期(比例)','預期的職涯發展需要哪些配合因素來達成',
         '哪些福利措施最有助於您留在工程與科技領域就業','您服務的單位或待業前服務的單位提供哪些職場相關措施',
         '您認為工程與科技領域最需要改善的性別議題有哪些','女性身上求學階段有否差異(性別)','女性身上求學階段有否差異','工程與科技領域女性身上職務選擇有否差異(性別)','工程與科技領域女性身上職務選擇有否差異',
         '不同性別在工程與科技領域的求職難易度有否差異(性別)','性別在求職時的職務選擇方面有否差異','不同性別的工程與科技領域主管是否有領導風格的差異(性別)','您個人比較偏好與何種性別工程與科技領域的主管共事(性別)',

@@ -2,14 +2,9 @@ import pandas as pd
 import os
 import re
 import numpy as np
-import scipy.stats as stats
-import researchpy as rp
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
-import matplotlib.pyplot as plt
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -46,8 +41,8 @@ for i in range(len(statData['1.單位名稱'])):
 statData = statData.drop(delList).reset_index(drop=True)
 
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
 os.getcwd()
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
@@ -141,10 +136,8 @@ colname = [ ['女性占比','女性占比','女性占比','女性占比','女性
 
 colname2 = [ ['女性佔比']*15+['總人數']*15,(['初階管理職']*5+['中階管理職']*5+['高階管理職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
-colname3 = [ ['各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比','各領域女性佔比',
-            '各領域人數','各領域人數','各領域人數','各領域人數','各領域人數','各領域人數','各領域人數','各領域人數','各領域人數','各領域人數',],
-            ['土木營建','建築、都市規劃','電子電機','資訊通訊','化工材料','生技醫工','環工綠能','機械','其他','非工程領域',
-            '土木營建','建築、都市規劃','電子電機','資訊通訊','化工材料','生技醫工','環工綠能','機械','其他','非工程領域'] ]
+colname3 = [ ['土木營建','土木營建','建築、都市規劃','建築、都市規劃','電子電機','電子電機','資訊通訊','資訊通訊','化工材料','化工材料','生技醫工','生技醫工','環工綠能','環工綠能','機械','機械','其他','其他','非工程與科技領域','非工程與科技領域'],
+            ['女性佔比','總人數']*20 ]
 
 colname4 = [ ['女性佔比']*15+['總人數']*15,(['初階專業職']*5+['中階專業職']*5+['高階專業職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
@@ -191,12 +184,16 @@ girlRate = (girl/member)*100
 girlRate = girlRate.fillna(0)
 temp = (girl/member).fillna(0)
 girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
-result1 = pd.concat([girlRate,member],axis=1)
+result = pd.DataFrame(index=list(girlRate.index))
+for i in range(len(theme)):
+    result[theme[i]+str(0)]=girlRate[theme[i]]
+    result[theme[i]+str(1)]=member[theme[i]]
+
 temp = pd.concat([temp,member],axis=1)
 member_analysis_n = temp
-result1.columns = colname3
-result1.columns.names = ['','']
-result1.loc['合計'] = ['-']*(len(theme)+1)+list(member.sum())
+result.columns = colname3
+result.columns.names = ['','']
+result.loc['合計'] = 
 member_analysis = result1.copy()
 #result1.to_csv('總人數分析.csv',encoding='utf_8_sig')
 
