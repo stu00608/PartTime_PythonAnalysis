@@ -3,8 +3,8 @@ import os
 import re
 import numpy as np
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -12,15 +12,18 @@ import ct_tool as ct
 #記得路徑不同電腦要改
 
 #研官產
-classification = []
-data = pd.read_excel("004.xlsx",sheetname=2,usecols=[1])
+classification = [] 
+data = pd.read_excel("004.xlsx",sheet_name=2,usecols=[1]) #產
 data = list(data['單位'])
+data += ['國際聯合科技','國際聯合科技股份有限公司','鼎原科技股份有限公司','國際聯合科技','國際聯合科技股份有限公司','世紀離岸風電設備股份有限公司','主動元件事業處','連展科技股份有限公司連接器事業處研發部','呈峰營造','台科大第一宿舍拆除重建工程','泰誠發展營造股份有限公司','點晶科技股份有限公司','環球水泥股份有限公司','中鋼','聚和國際','國光生物科技股份有限公司','鼎漢國際工程顧問公司','台化工務部設計組','台灣自來水公司中區工程處']
 classification.append(data)
-data = pd.read_excel("004.xlsx",sheetname=1,usecols=[0])
+data = pd.read_excel("004.xlsx",sheet_name=1,usecols=[0]) #研
 data = list(data['單位'])
+['財團法人中華顧問工程司','財團法人臺灣營建研究院','財團法人國家實驗研究院','財團法人食品工業發展研究所','財團法人國家同步輻射研究中心']
 classification.append(data)
-data = pd.read_excel("004.xlsx",sheetname=0,usecols=[1])
+data = pd.read_excel("004.xlsx",sheet_name=0,usecols=[1]) #官
 data = list(data['單位'])
+data += ['交通部高速公路局中區養護工程分局','新北市政府水利局','交通部鐵道局']
 classification.append(data)
 for i in range(3):
     for j in range(len(classification[i])):
@@ -41,14 +44,16 @@ for i in range(len(statData['1.單位名稱'])):
 statData = statData.drop(delList).reset_index(drop=True)
 
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
 os.getcwd()
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
 
 reportData = pd.DataFrame(columns=['回報資料'])
 lost_company = pd.DataFrame(columns=['其他歸類單位'])
+allUnit = len(list(statData.index))
+
 
 #數字檢測(把float獨立出來檢查)
 detectList = [ '2.單位總員工人數','土木營建領域專長 男性 專任 人數','建築、都市規劃領域專長 男性 專任 人數','電子電機領域專長 男性 專任 人數','資訊通訊領域專長 男性 專任 人數','化工材料領域專長 男性 專任 人數','生技醫工領域專長 男性 專任 人數','環工綠能領域專長 男性 專任 人數','機械領域專長 男性 專任 人數','其他領域專長 男性 專任 人數','非工程與科技領域專長 男性 專任 人數','土木營建領域專長 女性 專任 人數','建築、都市規劃領域專長 女性 專任 人數','電子電機領域專長 女性 專任 人數','資訊通訊領域專長 女性 專任 人數','化工材料領域專長 女性 專任 人數','生技醫工領域專長 女性 專任 人數','環工綠能領域專長 女性 專任 人數','機械領域專長 女性 專任 人數','其他領域專長 女性 專任 人數','非工程與科技領域專長 女性 專任 人數']+['106年 請假人次','107年 請假人次','108年 請假人次']+['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']+['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']+['管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上']+list(['服務年資1~5年.'+str(i) for i in range(1,18)])+list(['服務年資6~10年.'+str(i) for i in range(1,18)])+list(['服務年資11~15年.'+str(i) for i in range(1,18)])+list(['服務年資16~20年.'+str(i) for i in range(1,18)])+list(['服務年資21~25年.'+str(i) for i in range(1,18)])+list(['服務年資25年以上.'+str(i) for i in range(1,18)])+list(['管理職年資1~5年.'+str(i) for i in range(1,18)])+list(['管理職年資6~10年.'+str(i) for i in range(1,18)])+list(['管理職年資11~15年.'+str(i) for i in range(1,18)])+list(['管理職年資16~20年.'+str(i) for i in range(1,18)])+list(['管理職年資21~25年.'+str(i) for i in range(1,18)])+list(['管理職年資25年以上.'+str(i) for i in range(1,18)])+list(['35歲以下.'+str(i) for i in range(1,108)])+list(['36-45歲.'+str(i) for i in range(1,108)])+list(['46-55歲.'+str(i) for i in range(1,108)])+list(['56-65歲.'+str(i) for i in range(1,108)])+list(['66歲以上.'+str(i) for i in range(1,108)])+list(['106年 請假人次.'+str(i) for i in range(1,4)])+list(['107年 請假人次.'+str(i) for i in range(1,4)])+list(['108年 請假人次.'+str(i) for i in range(1,4)])
@@ -66,53 +71,93 @@ for columns in detectList:
                 temp = int(temp)
             else:
                 temp = int(re.sub('\D','',str(temp)))
-            statData.loc[i,columns] = temp
+            statData.at[i,columns] = temp
+            #statData.set_value(i,columns,temp)
             # 1.0 10 'xxx' '10x'
         else:
-            statData.loc[i,columns] = 0
+            statData.at[i,columns] = 0
 
 j=k=m=0
+existList = []
+existDict = {}
+alreadyExistList = []
+alreadyExistDict = {}
 for i in range(len(statData['1.單位名稱'])):
-    if(   str(statData['1.單位名稱'][i]).find('經濟部水利署') != -1 ):
-        statData.loc[i,'1.單位名稱']='水利署'
-        j+=1
-    elif( str(statData['1.單位名稱'][i]).find('公路總局') != -1 ):
-        statData.loc[i,'1.單位名稱']='公路總局'
-        k+=1
-    elif( str(statData['1.單位名稱'][i]).find('台灣電力') != -1 ):
-        statData.loc[i,'1.單位名稱']='台灣電力股份有限公司'
-        m+=1
-    elif( str(statData['1.單位名稱'][i]).find('臺灣電力') != -1 ):
-        statData.loc[i,'1.單位名稱']='台灣電力股份有限公司'
-        m+=1
-    elif( str(statData['1.單位名稱'][i]).find('台電') != -1 ):
-        statData.loc[i,'1.單位名稱']='台灣電力股份有限公司'
-        m+=1
-    elif( str(statData['1.單位名稱'][i]).find('臺電') != -1 ):
-        statData.loc[i,'1.單位名稱']='台灣電力股份有限公司'
-        m+=1
+    if(statData['1.單位名稱'][i] in existList):
+        if(alreadyExistDict.get(statData['1.單位名稱'][i],0) == 0):
+            alreadyExistDict[statData['1.單位名稱'][i]] = []
+        alreadyExistDict[statData['1.單位名稱'][i]] += [i] #第二次以後出現的index
+        alreadyExistList.append(statData['1.單位名稱'][i])
+        continue
+    else:
+        existDict[statData.at[i,'1.單位名稱']] = i #第一次出現的index
+        existList.append(statData.at[i,'1.單位名稱'])
 
-reportData.loc['水利署'] = j
-reportData.loc['公路總局'] = k
-reportData.loc['台灣電力股份有限公司'] = m
+nameCheck_statData = statData.copy()
 
-reportData.loc['填答單位數'] = len(list(statData.index))
+water = ['經濟部水利署']
+road = ['公路總局','公路局第五區養護工程處-阿里山工務段','新化','埔里工務段','西濱北工處第七工務段','西部濱海公路南區臨時工程處第六工務段','第二區養護工程處台中段','新化工務段','交通部第五區養護工程處新化工務段','西濱北工處工務段','蘇花公路改善工程處勞安科','埔里工務段','埔里工務段','西部濱海公路北區臨時工程處第一工務段','港灣工程部']
+electronic = ['台灣電力','臺灣電力','台電','臺電']
+
+for i in range(len(statData['1.單位名稱'])):
+
+    for item in water:
+        if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
+            statData.at[i,'1.單位名稱']='水利署'
+            j+=1
+    for item in road:
+        if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
+            statData.at[i,'1.單位名稱']='公路總局'
+            k+=1
+    for item in electronic:
+        if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
+            statData.at[i,'1.單位名稱']='台灣電力股份有限公司'
+            m+=1
+
+delList = []
+for item in alreadyExistDict:
+    delList += alreadyExistDict[item][:-1]
+    delList.append(existDict[item])
+delList.sort()
+delUnit = []
+temp = list(statData['1.單位名稱'])
+for item in delList:
+    delUnit.append(temp[item])
+statData = statData.drop(delList,axis=0).reset_index(drop=True)
+nameCheck_statData = nameCheck_statData.drop(delList,axis=0).reset_index(drop=True)
+
+reportData.at['水利署總回填數'] = j
+reportData.at['水利署重複回填數'] = delUnit.count('水利署')
+reportData.at['水利署有效回填數'] = j-delUnit.count('水利署')
+
+reportData.at['公路總局總回填數'] = k
+reportData.at['公路總局重複回填數'] = delUnit.count('公路總局')
+reportData.at['公路總局有效回填數'] = k-delUnit.count('公路總局')
+
+reportData.at['台灣電力股份有限公司總回填數'] = m
+reportData.at['台灣電力股份有限公司重複回填數'] = delUnit.count('台灣電力股份有限公司')
+reportData.at['台灣電力股份有限公司有效回填數'] = m-delUnit.count('台灣電力股份有限公司')
+
+reportData.at['其他機構重複回填數'] = len(delUnit)-delUnit.count('水利署')-delUnit.count('公路總局')-delUnit.count('台灣電力股份有限公司')
+
+reportData.at['其他資訊'] = '---'
+reportData.at['填答單位數'] = allUnit
+reportData.at['有效單位數'] = len(list(statData.index))
 
 category = ['研小計','官小計','產小計','其他']
-
 
 i=0
 for j in range(len(statData['1.單位名稱'])):
     if( classification[0].count(statData['1.單位名稱'][j])>=1 ):
-        statData.loc[j,'1.單位名稱']='產小計'
+        statData.at[j,'1.單位名稱']='產小計'
     elif(classification[1].count(statData['1.單位名稱'][j])>=1):
-        statData.loc[j,'1.單位名稱']='研小計'
+        statData.at[j,'1.單位名稱']='研小計'
     elif(classification[2].count(statData['1.單位名稱'][j])>=1):
-        statData.loc[j,'1.單位名稱']='官小計'
+        statData.at[j,'1.單位名稱']='官小計'
     else:
-        lost_company.loc[i] = statData['1.單位名稱'][j]
+        lost_company.at[i] = statData['1.單位名稱'][j]
         i+=1
-        statData.loc[j,'1.單位名稱']='其他'
+        statData.at[j,'1.單位名稱']='其他'
         
 
 
@@ -121,13 +166,13 @@ num = ['50人以下','50~250人','250人以上']
 # for i in range(len(statData)):
 #     v1 = int(statData['2.單位總員工人數'][i])
 #     if( v1<=49 and v1>=1) :
-#         statData.loc[i,'2.單位總員工人數'] = num[0]
+#         statData.at[i,'2.單位總員工人數'] = num[0]
 #     elif( v1>49 and v1<250 ):
-#         statData.loc[i,'2.單位總員工人數'] = num[1]
+#         statData.at[i,'2.單位總員工人數'] = num[1]
 #     elif( v1>249 ):
-#         statData.loc[i,'2.單位總員工人數'] = num[2]
+#         statData.at[i,'2.單位總員工人數'] = num[2]
 #     else:
-#         statData.loc[i,'2.單位總員工人數']=None
+#         statData.at[i,'2.單位總員工人數']=None
 
 #---main---#
 
@@ -137,7 +182,7 @@ colname = [ ['女性占比','女性占比','女性占比','女性占比','女性
 colname2 = [ ['女性佔比']*15+['總人數']*15,(['初階管理職']*5+['中階管理職']*5+['高階管理職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
 colname3 = [ ['土木營建','土木營建','建築、都市規劃','建築、都市規劃','電子電機','電子電機','資訊通訊','資訊通訊','化工材料','化工材料','生技醫工','生技醫工','環工綠能','環工綠能','機械','機械','其他','其他','非工程與科技領域','非工程與科技領域'],
-            ['女性佔比','總人數']*20 ]
+            ['女性佔比','總人數']*10 ]
 
 colname4 = [ ['女性佔比']*15+['總人數']*15,(['初階專業職']*5+['中階專業職']*5+['高階專業職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
@@ -161,7 +206,7 @@ for name in num:
     except:
         continue
     df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-    result.loc[name]=list(df1[name])
+    result.at[name]=list(df1[name])
 
 for name in category:
     try:
@@ -169,7 +214,7 @@ for name in category:
     except:
         continue
     df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-    result.loc[name]=list(df1[name])
+    result.at[name]=list(df1[name])
 
 
 
@@ -183,18 +228,24 @@ member = (boy+girl).astype(int)
 girlRate = (girl/member)*100
 girlRate = girlRate.fillna(0)
 temp = (girl/member).fillna(0)
+member.at['合計'] = list(member.sum())
+member = member.astype(int)
+girlRate.at['合計'] = list(girlRate.sum())
 girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
+
 result = pd.DataFrame(index=list(girlRate.index))
 for i in range(len(theme)):
     result[theme[i]+str(0)]=girlRate[theme[i]]
     result[theme[i]+str(1)]=member[theme[i]]
 
-temp = pd.concat([temp,member],axis=1)
+result['非工程與科技領域'+str(0)]=girlRate['非工程與科技領域']
+result['非工程與科技領域'+str(1)]=member['非工程與科技領域']
+
+temp = pd.concat([temp,member],axis=1,sort=True)
 member_analysis_n = temp
 result.columns = colname3
 result.columns.names = ['','']
-result.loc['合計'] = 
-member_analysis = result1.copy()
+member_analysis = result.copy()
 #result1.to_csv('總人數分析.csv',encoding='utf_8_sig')
 
 #------------------------#
@@ -299,6 +350,8 @@ management_n = []
 professional = []
 professional_n = []
 
+
+
 for i in range(9):
 
     inputList = themeList[i]
@@ -316,7 +369,7 @@ for i in range(9):
     #     except:
     #         continue
     #     df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-    #     result.loc[name]=list(df1[name])
+    #     result.at[name]=list(df1[name])
 
     for name in category:
         try:
@@ -324,17 +377,23 @@ for i in range(9):
         except:
             continue
         df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-        result.loc[name] = list(df1[name])
+        result.at[name] = list(df1[name])
+
+    result.at['合計'] = list(result.sum())
 
     #result.index.name='單位總員工人數'
 
     #年資
     #總人數
-    target = inputList[4:16]
+    target = inputList[5:17]
     boy = result[target[:6]]
     boy.columns = ['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']
     girl = result[target[6:]]
     girl.columns = ['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']
+    boy = boy.T
+    girl = girl.T
+    boy.at['合計'] = list(boy.sum())
+    girl.at['合計'] = list(girl.sum())
     member = (boy+girl).astype(int)
     #女性佔比
     temp = (girl/member).fillna(0)
@@ -342,130 +401,219 @@ for i in range(9):
     girlRate = girlRate.fillna(0)
     temp = (girl/member).fillna(0)
     girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
-    girlRate.loc['合計'] = ['-']*len(list(girlRate.columns))
-    member.loc['合計'] = list(member.sum())
-    result1 = pd.concat([girlRate,member],axis=1)
-    temp = pd.concat([temp,member],axis=1)
-    seniority_n.append(temp)
-    result1.columns = colname
+    col = list(member.columns) 
+    index = list(member.index)
+    result1 = pd.DataFrame(index=index)
+    for item in col:
+        result1[item+'0']=girlRate[item]
+        result1[item+'1']=member[item]
+        
+    result1.columns = [ct.listDoubleMerge(col),['女性占比','總人數']*len(col)]
+    col.insert(0,col.pop()) #尾換到頭
+    result1 = result1[col]
+    index.insert(0,index.pop())
+    result1 = result1.reindex(index=index)
     result1.columns.names = [theme[i],'服務年資'] #i
     seniority.append(result1)
 
     #管理職年資
-    target = inputList[16:28]
+    target = inputList[17:29]
     boy = result[target[:6]]
     boy.columns = ['管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上']
     girl = result[target[6:]]
     girl.columns = ['管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上']
+    boy = boy.T
+    girl = girl.T
+    boy.at['合計'] = list(boy.sum())
+    girl.at['合計'] = list(girl.sum())
     member = (boy+girl).astype(int)
     #女性佔比
     girlRate = (girl/member)*100
     girlRate = girlRate.fillna(0)
     temp = (girl/member).fillna(0)
     girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
-    girlRate.loc['合計'] = ['-']*len(list(girlRate.columns))
-    member.loc['合計'] = list(member.sum())
-    result2 = pd.concat([girlRate,member],axis=1)
-    temp = pd.concat([temp,member],axis=1)
-    management_seniority_n.append(temp)
-    result2.columns = colname
-    result2.columns.names = [theme[i],'管理職服務年資'] #i
-    management_seniority.append(result2)
+    col = list(member.columns) 
+    index = list(member.index)
+    result1 = pd.DataFrame(index=index)
+    for item in col:
+        result1[item+'0']=girlRate[item]
+        result1[item+'1']=member[item]
+        
+    result1.columns = [ct.listDoubleMerge(col),['女性占比','總人數']*len(col)]
+    col.insert(0,col.pop()) #尾換到頭
+    result1 = result1[col]
+    index.insert(0,index.pop())
+    result1 = result1.reindex(index=index)
+    result1.columns.names = [theme[i],'管理職服務年資'] #i
+    management_seniority.append(result1)
 
     #各階管理職人員人數
 
-    target = inputList[28:58]
+    target = inputList[29:59]
+    ageCol = ['35歲以下', '36-45歲', '46-55歲', '56-65歲', '66歲以上']
+    level = ['初階管理職','中階管理職','高階管理職']
+    result2 = pd.DataFrame()
+    for i in range(3):
 
-    temp = []
-    temp.append(result[target[:10]].astype(int))
-    temp.append(result[target[10:20]].astype(int))
-    temp.append(result[target[20:30]].astype(int)) 
-    member = []
-    girlRate = []
-    girlRate_n = []
+        data = result[target[i*10:i*10+10]].astype(int)
+        col = list(data.columns)
+        index = list(data.index)
 
-    for df in temp:
-        boy = df[df.columns[:5]]
-        boy.columns = ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']
-        girl = df[df.columns[5:10]]
-        girl.columns = ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']
-        member.append(boy+girl)
-        df1 = (girl/(boy+girl))*100
-        df1 = df1.fillna(0)
-        temp = (girl/(boy+girl)).fillna(0)
-        girlRate_n.append(temp)
-        df1 = (df1.round(1).astype(str) + '%').replace('0.0%','-')
-        girlRate.append(df1)
+        member = pd.DataFrame(index=index)
+        for j in range(len(ageCol)):
+            member[ageCol[j]]=list(data[col[j]]+data[col[j+5]])
+        girl = data[col[5:]]
+        girl.columns = ageCol
+        member = member.T
+        member.at['合計'] = list(member.sum())
+        member = member.astype(int)
+        girl=girl.T
+        girl.at['合計'] = list(girl.sum())
+        girlRate = (girl/member)*100
+        girlRate = girlRate.fillna(0)
 
-    result3 = pd.concat([girlRate[0],girlRate[1],girlRate[2],member[0],member[1],member[2]],axis=1)
-    result3.loc['合計'] = ['-']*15+list(result3.sum())[15:]
-    temp = pd.concat([girlRate_n[0],girlRate_n[1],girlRate_n[2],member[0],member[1],member[2]],axis=1)
-    temp.loc['合計'] = ['-']*15+list(result3.sum())[15:]
-    management_n.append(temp)
-    result3.columns = colname2
-    result3.columns.names = [theme[i],'階層','年齡'] #i
-    management.append(result3)
+        girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
+        result1 = pd.DataFrame(index=list(girlRate.index))
+        for item in index[:5]:
+            result1[item+'0']=girlRate[item]
+            result1[item+'1']=member[item]
+
+        result1.columns = [ ct.listDoubleMerge(girlRate.columns) , ['女性占比','總人數']*len(list(girlRate.columns))]
+        col = list(girlRate.columns)
+        col.insert(0,col.pop())
+        result1 = result1[col]
+
+        index = list(girlRate.index)
+        index.insert(0,index.pop())
+        result1 = result1.reindex(index=index)
+        result1.index = [ [level[i]]*len(index) , index]
+        if(result2.empty):
+            result2 = result1.copy()
+        else:
+            result2 = pd.concat([result2,result1],axis=0)
+
+    management.append(result2)
 
     #專業職人員
-    target = inputList[58:]
 
-    temp = []
-    temp.append(result[target[:10]].astype(int))
-    temp.append(result[target[10:20]].astype(int))
-    temp.append(result[target[20:30]].astype(int)) 
-    member = []
-    girlRate = []
-    girlRate_n = []
+    target = inputList[29:59]
+    ageCol = ['35歲以下', '36-45歲', '46-55歲', '56-65歲', '66歲以上']
+    level = ['初階專業職','中階專業職','高階專業職']
+    result2 = pd.DataFrame()
+    for i in range(3):
 
-    for df in temp:
-        boy = df[df.columns[:5]]
-        boy.columns = ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']
-        girl = df[df.columns[5:10]]
-        girl.columns = ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']
-        member.append(boy+girl)
-        df1 = (girl/(boy+girl))*100
-        df1 = df1.fillna(0)
-        temp = (girl/(boy+girl)).fillna(0)
-        girlRate_n.append(temp)
-        df1 = (df1.round(1).astype(str) + '%').replace('0.0%','-')
-        girlRate.append(df1)
+        data = result[target[i*10:i*10+10]].astype(int)
+        col = list(data.columns)
+        index = list(data.index)
 
-    result3 = pd.concat([girlRate[0],girlRate[1],girlRate[2],member[0],member[1],member[2]],axis=1)
-    result3.loc['合計'] = ['-']*15+list(result3.sum())[15:]
-    temp = pd.concat([girlRate_n[0],girlRate_n[1],girlRate_n[2],member[0],member[1],member[2]],axis=1)
-    temp.loc['合計'] = ['-']*15+list(result3.sum())[15:]
-    professional_n.append(temp)
-    result3.columns = colname4
-    result3.columns.names = [theme[i],'階層','年齡'] #i
-    professional.append(result3)
+        member = pd.DataFrame(index=index)
+        for j in range(len(ageCol)):
+            member[ageCol[j]]=list(data[col[j]]+data[col[j+5]])
+        girl = data[col[5:]]
+        girl.columns = ageCol
+        member = member.T
+        member.at['合計'] = list(member.sum())
+        member = member.astype(int)
+        girl=girl.T
+        girl.at['合計'] = list(girl.sum())
+        girlRate = (girl/member)*100
+        girlRate = girlRate.fillna(0)
+
+        girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
+        result1 = pd.DataFrame(index=list(girlRate.index))
+        for item in index[:5]:
+            result1[item+'0']=girlRate[item]
+            result1[item+'1']=member[item]
+
+        result1.columns = [ ct.listDoubleMerge(girlRate.columns) , ['女性占比','總人數']*len(list(girlRate.columns))]
+        col = list(girlRate.columns)
+        col.insert(0,col.pop())
+        result1 = result1[col]
+
+        index = list(girlRate.index)
+        index.insert(0,index.pop())
+        result1 = result1.reindex(index=index)
+        result1.index = [ [level[i]]*len(index) , index]
+        if(result2.empty):
+            result2 = result1.copy()
+        else:
+            result2 = pd.concat([result2,result1],axis=0)
+
+    professional.append(result2)    
+
+
 
 #第三部分：性別相關福利措施，以及轉入工程與科技領域之案例
-'''
+
 col = ['106年 請假人次','107年 請假人次','108年 請假人次','106年 請假人次.1','107年 請假人次.1','108年 請假人次.1','106年 請假人次.2','107年 請假人次.2','108年 請假人次.2','106年 請假人次.3','107年 請假人次.3','108年 請假人次.3']
 inputList = statData[['1.單位名稱']+col+['哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']]
+yearCol = ['106年','107年','108年']
+title = ['過去三年間機構獲准之育嬰留職停薪人次','去三年間機構獲准之家庭照謢假人次']
 
 result = pd.DataFrame(columns=col)
-
 for name in category:
     try:
         df1 = ct.group_table(inputList,'1.單位名稱',[name])
     except:
         continue
-    df1 = pd.DataFrame(data=inputList[col].sum(),columns=[name])
-    result.loc[name] = list(df1[name])
+    result.at[name] = list(df1[col].sum())
 
-#第四
+result.at['產官研小計'] = list(result.sum())
+resultList = []
+for i in range(2):
+    boy = result[col[i*len(yearCol):i*len(yearCol)+len(yearCol)]]
+    boy.columns = yearCol
+    boy = boy.T
+    boy.at['各年小計'] = list(boy.sum())
+    girl = result[col[i*len(yearCol)+len(yearCol):i*len(yearCol)+len(yearCol)*2]]
+    girl.columns = yearCol
+    girl = girl.T
+    girl.at['各年小計'] = list(girl.sum())
+    member = (boy+girl).astype(int)
+    girlRate = girlRate.T
+    girlRate = (girl/member)*100
+    girlRate = girlRate.fillna(0)
+    girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
+    column = list(member.columns) 
+    index = list(member.index)
+    result1 = pd.DataFrame(index=index)
+    for item in column:
+        result1[item+'0']=girlRate[item]
+        result1[item+'1']=member[item]
+    result1.columns = [ct.listDoubleMerge(column),['女性占比','總人數']*len(column)]
+    column.insert(0,column.pop()) #尾換到頭
+    result1 = result1[column]
+    index.insert(0,index.pop())
+    result1 = result1.reindex(index=index)
+    result1.columns.names=[title[i],'']
+    resultList.append(result1)
 
-inputList = statData[['請選擇:']]
+#---------------#
 
+col = ['哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']
+
+result = inputList[['1.單位名稱','哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']]
+
+answer = pd.DataFrame(columns=col)
+answerList = []
 for name in category:
+    
     try:
-        df1 = ct.group_table(statData,'1.單位名稱',[name])
+        result1 = ct.group_table(result,'1.單位名稱',[name])
     except:
         continue
-    df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-    result.loc[name] = list(df1[name])
-'''
+    result1 = result1.fillna(0).drop('1.單位名稱',axis=1).reset_index(drop=True)
+    for item in col:
+        count=0
+        for i in range(len(result[item])):
+            if (result[item][i] is not 0):
+                count+=1
+            
+        answerList.append(count)
+    
+    answer.at[name] = answerList
+
+
 with pd.ExcelWriter('單位版分析.xlsx') as writer:
     reportData.to_excel(writer,sheet_name='回報參數',encoding='utf_8_sig')
     lost_company.to_excel(writer,sheet_name='其他歸類單位',encoding='utf_8_sig')
