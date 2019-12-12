@@ -3,8 +3,8 @@ import os
 import re
 import numpy as np
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -33,19 +33,21 @@ statData = pd.read_excel("003.xlsx",skiprows=5)
 #statData = statData.dropna(axis=1,how='all')
 statData['46-55歲.re']=np.zeros(len(statData.index))
 delList = []
+unavailableUnit = []
 for i in range(len(statData['1.單位名稱'])):
     if(   str(statData['1.單位名稱'][i]).find('test') != -1 ):
         delList.append(i)
+        unavailableUnit.append(statData['1.單位名稱'][i])
     elif( str(statData['1.單位名稱'][i]).find('111111111111') != -1 ):
-        delList.append(i)
+        delList.append(statData['1.單位名稱'][i])
     elif( str(statData['1.單位名稱'][i]).find('測試') != -1 ):
-        delList.append(i)
+        delList.append(statData['1.單位名稱'][i])
 
 statData = statData.drop(delList).reset_index(drop=True)
 
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
 os.getcwd()
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
@@ -144,9 +146,10 @@ reportData.at['其他資訊'] = '---'
 reportData.at['填答單位數'] = allUnit
 reportData.at['有效單位數'] = len(list(statData.index))
 
-category = ['研小計','官小計','產小計','其他']
+category = ['研小計','官小計','產小計']
 
 i=0
+delList = []
 for j in range(len(statData['1.單位名稱'])):
     if( classification[0].count(statData['1.單位名稱'][j])>=1 ):
         statData.at[j,'1.單位名稱']='產小計'
@@ -156,8 +159,9 @@ for j in range(len(statData['1.單位名稱'])):
         statData.at[j,'1.單位名稱']='官小計'
     else:
         lost_company.at[i] = statData['1.單位名稱'][j]
+        delList.append(statData['1.單位名稱'][j])
         i+=1
-        statData.at[j,'1.單位名稱']='其他'
+        #statData.at[j,'1.單位名稱']='其他'
         
 
 
@@ -228,9 +232,9 @@ member = (boy+girl).astype(int)
 girlRate = (girl/member)*100
 girlRate = girlRate.fillna(0)
 temp = (girl/member).fillna(0)
-member.at['合計'] = list(member.sum())
+member.at['產官研合計'] = list(member.sum())
 member = member.astype(int)
-girlRate.at['合計'] = list(girlRate.sum())
+girlRate.at['產官研合計'] = list(girlRate.sum())
 girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
 
 result = pd.DataFrame(index=list(girlRate.index))
@@ -246,6 +250,9 @@ member_analysis_n = temp
 result.columns = colname3
 result.columns.names = ['','']
 member_analysis = result.copy()
+index = list(member_analysis.index)
+index.insert(0,index.pop())
+member_analysis = member_analysis.reindex(index=index)
 #result1.to_csv('總人數分析.csv',encoding='utf_8_sig')
 
 #------------------------#
@@ -255,90 +262,6 @@ themeList = [ ['1.單位名稱','2.單位總員工人數',theme[i],theme[i]+'領
 
 for i in range(1,len(theme)):
     themeList.append(['1.單位名稱','2.單位總員工人數',theme[i],theme[i]+'領域專長 男性 專任 人數',theme[i]+'領域專長 女性 專任 人數']+['服務年資1~5年.'+str(i*2),'服務年資6~10年.'+str(i*2),'服務年資11~15年.'+str(i*2),'服務年資16~20年.'+str(i*2),'服務年資21~25年.'+str(i*2),'服務年資25年以上.'+str(i*2)]+['服務年資1~5年.'+str(i*2+1),'服務年資6~10年.'+str(i*2+1),'服務年資11~15年.'+str(i*2+1),'服務年資16~20年.'+str(i*2+1),'服務年資21~25年.'+str(i*2+1),'服務年資25年以上.'+str(i*2+1)]+['管理職年資1~5年.'+str(i*2),'管理職年資6~10年.'+str(i*2),'管理職年資11~15年.'+str(i*2),'管理職年資16~20年.'+str(i*2),'管理職年資21~25年.'+str(i*2),'管理職年資25年以上.'+str(i*2)]+['管理職年資1~5年.'+str(i*2+1),'管理職年資6~10年.'+str(i*2+1),'管理職年資11~15年.'+str(i*2+1),'管理職年資16~20年.'+str(i*2+1),'管理職年資21~25年.'+str(i*2+1),'管理職年資25年以上.'+str(i*2+1)]+['35歲以下.'+str(i*2),'36-45歲.'+str(i*2),'46-55歲.'+str(i*2),'56-65歲.'+str(i*2),'66歲以上.'+str(i*2)]+['35歲以下.'+str(i*2+1),'36-45歲.'+str(i*2+1),'46-55歲.'+str(i*2+1),'56-65歲.'+str(i*2+1),'66歲以上.'+str(i*2+1)]+['35歲以下.'+str(i*2+18),'36-45歲.'+str(i*2+18),'46-55歲.'+str(i*2+18),'56-65歲.'+str(i*2+18),'66歲以上.'+str(i*2+18)]+['35歲以下.'+str(i*2+18+1),'36-45歲.'+str(i*2+18+1),'46-55歲.'+str(i*2+18+1),'56-65歲.'+str(i*2+18+1),'66歲以上.'+str(i*2+18+1)]+['35歲以下.'+str(i*2+36),'36-45歲.'+str(i*2+36),'46-55歲.'+str(i*2+36),'56-65歲.'+str(i*2+36),'66歲以上.'+str(i*2+36)]+['35歲以下.'+str(i*2+36+1),'36-45歲.'+str(i*2+36+1),'46-55歲.'+str(i*2+36+1),'56-65歲.'+str(i*2+36+1),'66歲以上.'+str(i*2+36+1)]+['35歲以下.'+str(i*2+54),'36-45歲.'+str(i*2+54),'46-55歲.'+str(i*2+54),'56-65歲.'+str(i*2+54),'66歲以上.'+str(i*2+54)]+['35歲以下.'+str(i*2+54+1),'36-45歲.'+str(i*2+54+1),'46-55歲.'+str(i*2+54+1),'56-65歲.'+str(i*2+54+1),'66歲以上.'+str(i*2+54+1)]+['35歲以下.'+str(i*2+72),'36-45歲.'+str(i*2+72),'46-55歲.'+str(i*2+72),'56-65歲.'+str(i*2+72),'66歲以上.'+str(i*2+72)]+['35歲以下.'+str(i*2+72+1),'36-45歲.'+str(i*2+72+1),'46-55歲.'+str(i*2+72+1),'56-65歲.'+str(i*2+72+1),'66歲以上.'+str(i*2+72+1)]+['35歲以下.'+str(i*2+90),'36-45歲.'+str(i*2+90),'46-55歲.'+str(i*2+90),'56-65歲.'+str(i*2+90),'66歲以上.'+str(i*2+90)]+['35歲以下.'+str(i*2+90+1),'36-45歲.'+str(i*2+90+1),'46-55歲.'+str(i*2+90+1),'56-65歲.'+str(i*2+90+1),'66歲以上.'+str(i*2+90+1)])
-
-'''
-
-themeList = [ ['1.單位名稱','2.單位總員工人數', #0
-                '土木營建', #1
-                '土木營建領域專長 男性 專任 人數','土木營建領域專長 女性 專任 人數', #2
-                '服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上','服務年資1~5年.1','服務年資6~10年.1','服務年資11~15年.1','服務年資16~20年.2','服務年資21~25年.1','服務年資25年以上.1', #4
-                '管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上','管理職年資1~5年.1','管理職年資6~10年.1','管理職年資11~15年.1','管理職年資16~20年.1','管理職年資21~25年.1','管理職年資25年以上.1', #16
-                '35歲以下','36-45歲','46-55歲','56-65歲','66歲以上','35歲以下.1','36-45歲.1','46-55歲.1','56-65歲.1','66歲以上.1', #28
-                '35歲以下.18','36-45歲.18','46-55歲.17','56-65歲.18','66歲以上.18','35歲以下.19','36-45歲.19','46-55歲.18','56-65歲.19','66歲以上.19', #38
-                '35歲以下.36','36-45歲.36','46-55歲.35','56-65歲.36','66歲以上.36','35歲以下.37','36-45歲.37','46-55歲.36','56-65歲.37','66歲以上.37'] ,#48
-              ['1.單位名稱','2.單位總員工人數',
-                '建築、都市規劃',
-                '建築、都市規劃領域專長 男性 專任 人數','建築、都市規劃領域專長 女性 專任 人數',
-                '服務年資1~5年.2','服務年資6~10年.2','服務年資11~15年.2','服務年資16~20年.3','服務年資21~25年.2','服務年資25年以上.2','服務年資1~5年.3','服務年資6~10年.3','服務年資11~15年.3','服務年資16~20年.4','服務年資21~25年.3','服務年資25年以上.3',
-                '管理職年資1~5年.2','管理職年資6~10年.2','管理職年資11~15年.2','管理職年資16~20年.2','管理職年資21~25年.2','管理職年資25年以上.2','管理職年資1~5年.3','管理職年資6~10年.3','管理職年資11~15年.3','管理職年資16~20年.3','管理職年資21~25年.3','管理職年資25年以上.3',
-                '35歲以下.2','36-45歲.2','46-55歲.2','56-65歲.2','66歲以上.2','35歲以下.3','36-45歲.3','46-55歲.3','56-65歲.3','66歲以上.3',
-                '35歲以下.20','36-45歲.20','46-55歲.19','56-65歲.20','66歲以上.20','35歲以下.21','36-45歲.21','46-55歲.20','56-65歲.21','66歲以上.21',
-                '35歲以下.38','36-45歲.38','46-55歲.37','56-65歲.38','66歲以上.38','35歲以下.39','36-45歲.39','46-55歲.38','56-65歲.39','66歲以上.39'],
-              ['1.單位名稱','2.單位總員工人數',
-                '電子電機',
-                '電子電機領域專長 男性 專任 人數','電子電機領域專長 女性 專任 人數',
-                '服務年資1~5年.4','服務年資6~10年.4','服務年資11~15年.4','服務年資16~20年.5','服務年資21~25年.4','服務年資25年以上.4','服務年資1~5年.5','服務年資6~10年.5','服務年資11~15年.5','服務年資16~20年.6','服務年資21~25年.5','服務年資25年以上.5',
-                '管理職年資1~5年.4','管理職年資6~10年.4','管理職年資11~15年.4','管理職年資16~20年.4','管理職年資21~25年.4','管理職年資25年以上.4','管理職年資1~5年.5','管理職年資6~10年.5','管理職年資11~15年.5','管理職年資16~20年.5','管理職年資21~25年.5','管理職年資25年以上.5',
-                '35歲以下.4','36-45歲.4','46-55歲.4','56-65歲.4','66歲以上.4','35歲以下.5','36-45歲.5','46-55歲.5','56-65歲.5','66歲以上.5',
-                '35歲以下.22','36-45歲.22','46-55歲.21','56-65歲.22','66歲以上.22','35歲以下.23','36-45歲.23','46-55歲.22','56-65歲.23','66歲以上.23',
-                '35歲以下.40','36-45歲.40','45-55歲','56-65歲.40','66歲以上.40','35歲以下.41','36-45歲.41','46-55歲.39','56-65歲.41','66歲以上.41'],
-              ['1.單位名稱','2.單位總員工人數',
-                '資訊通訊',
-                '資訊通訊領域專長 男性 專任 人數','資訊通訊領域專長 女性 專任 人數',
-                '服務年資1~5年.6','服務年資6~10年.6','服務年資11~15年.6','服務年資16~20年.7','服務年資21~25年.6','服務年資25年以上.6','服務年資1~5年.7','服務年資6~10年.7','服務年資11~15年.7','服務年資16~20年.8','服務年資21~25年.7','服務年資25年以上.7',
-                '管理職年資1~5年.6','管理職年資6~10年.6','管理職年資11~15年.6','管理職年資16~20年.6','管理職年資21~25年.6','管理職年資25年以上.6','管理職年資1~5年.7','管理職年資6~10年.7','管理職年資11~15年.7','管理職年資16~20年.7','管理職年資21~25年.7','管理職年資25年以上.7',
-                '35歲以下.6','36-45歲.6','46-55歲.6','56-65歲.6','66歲以上.6','35歲以下.7','36-45歲.7','46-55歲.7','56-65歲.7','66歲以上.7',
-                '35歲以下.24','36-45歲.24','46-55歲.23','56-65歲.24','66歲以上.24','35歲以下.25','36-45歲.25','46-55歲.24','56-65歲.25','66歲以上.25',
-                '35歲以下.42','36-45歲.42','46-55歲.40','56-65歲.42','66歲以上.42','35歲以下.43','36-45歲.43','46-55歲.41','56-65歲.43','66歲以上.43'],
-
-              ['1.單位名稱','2.單位總員工人數',
-                '化工材料',
-                '化工材料領域專長 男性 專任 人數','化工材料領域專長 女性 專任 人數',
-                '服務年資1~5年.8','服務年資6~10年.8','服務年資11~15年.8','服務年資16~20年.10','服務年資21~25年.8','服務年資25年以上.8','服務年資1~5年.9','服務年資6~10年.9','服務年資11~15年.9','服務年資16~20年.11','服務年資21~25年.9','服務年資25年以上.9',
-                '管理職年資1~5年.8','管理職年資6~10年.8','管理職年資11~15年.8','管理職年資16~20年.8','管理職年資21~25年.8','管理職年資25年以上.8','管理職年資1~5年.9','管理職年資6~10年.9','管理職年資11~15年.9','管理職年資16~20年.9','管理職年資21~25年.9','管理職年資25年以上.9',
-                '35歲以下.8','36-45歲.8','46-55歲.8','56-65歲.8','66歲以上.8','35歲以下.9','36-45歲.9','46-55歲.9','56-65歲.9','66歲以上.9',
-                '35歲以下.26','36-45歲.26','46-55歲.25','56-65歲.26','66歲以上.26','35歲以下.27','36-45歲.27','46-55歲.26','56-65歲.27','66歲以上.27',
-                '35歲以下.44','36-45歲.44','46-55歲.42','56-65歲.44','66歲以上.44','35歲以下.45','36-45歲.45','46-55歲.43','56-65歲.45','66歲以上.45'],
-            
-              ['1.單位名稱','2.單位總員工人數',
-                '生技醫工',
-                '生技醫工領域專長 男性 專任 人數','生技醫工領域專長 女性 專任 人數',
-                '服務年資1~5年.10','服務年資6~10年.10','服務年資11~15年.10','服務年資16~20年.12','服務年資21~25年.10','服務年資25年以上.10','服務年資1~5年.11','服務年資6~10年.11','服務年資11~15年.11','服務年資16~20年.13','服務年資21~25年.11','服務年資25年以上.11',
-                '管理職年資1~5年.11','管理職年資6~10年.10','管理職年資11~15年.10','管理職年資16~20年.10','管理職年資21~25年.10','管理職年資25年以上.10','管理職年資1~5年.12','管理職年資6~10年.11','管理職年資11~15年.11','管理職年資16~20年.11','管理職年資21~25年.11','管理職年資25年以上.11',
-                '35歲以下.10','36-45歲.10','46-55歲.10','56-65歲.10','66歲以上.10','35歲以下.11','36-45歲.11','46-55歲.11','56-65歲.11','66歲以上.11',
-                '35歲以下.28','36-45歲.28','46-55歲.27','56-65歲.28','66歲以上.28','35歲以下.29','36-45歲.29','46-55歲.28','56-65歲.29','66歲以上.29',
-                '35歲以下.46','36-45歲.46','46-55歲.44','56-65歲.46','66歲以上.46','35歲以下.47','36-45歲.47','46-55歲.45','56-65歲.47','66歲以上.47'],
-            
-              ['1.單位名稱','2.單位總員工人數',
-                '環工綠能',
-                '環工綠能領域專長 男性 專任 人數','環工綠能領域專長 女性 專任 人數',
-                '服務年資1~5年.12','服務年資6~10年.12','服務年資11~15年.12','服務年資16~20年.14','服務年資21~25年.12','服務年資25年以上.12','服務年資1~5年.13','服務年資6~10年.13','服務年資11~15年.13','服務年資16~20年.15','服務年資21~25年.13','服務年資25年以上.13',
-                '管理職年資1~5年.13','管理職年資6~10年.12','管理職年資11~15年.12','管理職年資16~20年.12','管理職年資21~25年.12','管理職年資25年以上.12','管理職年資1~5年.14','管理職年資6~10年.13','管理職年資11~15年.13','管理職年資16~20年.13','管理職年資21~25年.13','管理職年資25年以上.13',
-                '35歲以下.12','36-45歲.12','46-55歲.12','56-65歲.12','66歲以上.12','35歲以下.13','36-45歲.13','46-55歲.13','56-65歲.13','66歲以上.13',
-                '35歲以下.30','36-45歲.30','46-55歲.29','56-65歲.30','66歲以上.30','35歲以下.31','36-45歲.31','46-55歲.30','56-65歲.31','66歲以上.31',
-                '35歲以下.48','36-45歲.48','46-55歲.46','56-65歲.48','66歲以上.48','35歲以下.49','36-45歲.49','46-55歲.47','56-65歲.49','66歲以上.49'],
-
-              ['1.單位名稱','2.單位總員工人數',
-                '機械',
-                '機械領域專長 男性 專任 人數','機械領域專長 女性 專任 人數',
-                '服務年資1~5年.14','服務年資6~10年.14','服務年資11~15年.14','服務年資16~20年.16','服務年資21~25年.14','服務年資25年以上.14','服務年資1~5年.15','服務年資6~10年.15','服務年資11~15年.15','服務年資16~20年.17','服務年資21~25年.15','服務年資21~25年.16','服務年資25年以上.15',
-                '管理職年資1~5年.15','管理職年資6~10年.14','管理職年資11~15年.14','管理職年資16~20年.14','管理職年資21~25年.14','管理職年資25年以上.14','管理職年資1~5年.16','管理職年資6~10年.15','管理職年資11~15年.15','管理職年資16~20年.15','管理職年資21~25年.15','管理職年資25年以上.15',
-                '35歲以下.14','36-45歲.14','46-55歲.14','56-65歲.14','66歲以上.14','35歲以下.15','36-45歲.15','46-55歲.15','56-65歲.15','66歲以上.15',
-                '35歲以下.32','36-45歲.32','46-55歲.31','56-65歲.32','66歲以上.32','35歲以下.33','36-45歲.33','46-55歲.32','56-65歲.33','66歲以上.33',
-                '35歲以下.50','36-45歲.50','46-55歲.48','56-65歲.50','66歲以上.50','35歲以下.51','36-45歲.51','46-55歲.49','56-65歲.51','66歲以上.51',],
-
-              ['1.單位名稱','2.單位總員工人數',
-                '其他',
-                '其他領域專長 男性 專任 人數','其他領域專長 女性 專任 人數',
-                '服務年資1~5年.16','服務年資6~10年.16','服務年資11~15年.16','服務年資16~20年.18','服務年資21~25年.17','服務年資25年以上.16','服務年資1~5年.17','服務年資6~10年.17','服務年資11~15年.17','服務年資16~20年.19','服務年資21~25年.18','服務年資25年以上.17',
-                '管理職年資1~5年.17','管理職年資6~10年.16','管理職年資11~15年.16','管理職年資16~20年.16','管理職年資21~25年.16','管理職年資25年以上.16','管理職年資1~5年.18','管理職年資6~10年.17','管理職年資11~15年.17','管理職年資16~20年.17','管理職年資21~25年.17','管理職年資25年以上.17',
-                '35歲以下.16','36-45歲.16','46-55歲.16','56-65歲.16','66歲以上.16','35歲以下.17','36-45歲.17','46-55歲.re','56-65歲.17','66歲以上.17',
-                '35歲以下.34','36-45歲.34','46-55歲.33','56-65歲.34','66歲以上.34','35歲以下.35','36-45歲.35','46-55歲.34','56-65歲.35','66歲以上.35',
-                '35歲以下.52','36-45歲.52','46-55歲.50','56-65歲.52','66歲以上.52','35歲以下.53','36-45歲.53','46-55歲.51','56-65歲.53','66歲以上.53',]
-            
-            ]
-
-'''
 
 #放所有個別輸出資料
 seniority = []
@@ -379,7 +302,7 @@ for i in range(9):
         df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
         result.at[name] = list(df1[name])
 
-    result.at['合計'] = list(result.sum())
+    result.at['產官研合計'] = list(result.sum())
 
     #result.index.name='單位總員工人數'
 
@@ -414,6 +337,7 @@ for i in range(9):
     index.insert(0,index.pop())
     result1 = result1.reindex(index=index)
     result1.columns.names = [theme[i],'服務年資'] #i
+    result1 = result1.rename(index={'合計':'各年資合計'})
     seniority.append(result1)
 
     #管理職年資
@@ -445,6 +369,7 @@ for i in range(9):
     index.insert(0,index.pop())
     result1 = result1.reindex(index=index)
     result1.columns.names = [theme[i],'管理職服務年資'] #i
+    result1 = result1.rename(index={'合計':'各年資合計'})
     management_seniority.append(result1)
 
     #各階管理職人員人數
@@ -453,9 +378,10 @@ for i in range(9):
     ageCol = ['35歲以下', '36-45歲', '46-55歲', '56-65歲', '66歲以上']
     level = ['初階管理職','中階管理職','高階管理職']
     result2 = pd.DataFrame()
-    for i in range(3):
+    all_sum = []
+    for k in range(3):
 
-        data = result[target[i*10:i*10+10]].astype(int)
+        data = result[target[k*10:k*10+10]].astype(int)
         col = list(data.columns)
         index = list(data.index)
 
@@ -465,10 +391,20 @@ for i in range(9):
         girl = data[col[5:]]
         girl.columns = ageCol
         member = member.T
-        member.at['合計'] = list(member.sum())
+        member.at['各年齡合計'] = list(member.sum())
         member = member.astype(int)
+        if(member_sum):
+            member_sum = list(member.loc['各年齡合計'])
+        else:
+            member_sum += list(member.loc['各年齡合計'])
+        
         girl=girl.T
-        girl.at['合計'] = list(girl.sum())
+        girl.at['各年齡合計'] = list(girl.sum())
+        if(girl_sum):
+            girl_sum = list(girl.loc['各年齡合計'])
+        else:
+            girl_sum += list(girl.loc['各年齡合計'])
+        
         girlRate = (girl/member)*100
         girlRate = girlRate.fillna(0)
 
@@ -486,23 +422,47 @@ for i in range(9):
         index = list(girlRate.index)
         index.insert(0,index.pop())
         result1 = result1.reindex(index=index)
-        result1.index = [ [level[i]]*len(index) , index]
+        
+        
+
+        result1.index = [ [level[k]]*len(index) , index]
         if(result2.empty):
             result2 = result1.copy()
         else:
             result2 = pd.concat([result2,result1],axis=0)
 
+        if(not all_sum):
+            all_sum = girl_sum + member_sum
+        else:
+            tempAllSum = girl_sum + member_sum
+            for n in range(len(all_sum)):
+                all_sum[n]+=tempAllSum[n] 
+        
+#all_sum.append(all_sum.pop(0))
+#all_sum.append(all_sum.pop(0))
+    newAllSum = []
+    for n in range(len(all_sum)//2):
+        girlRate = (all_sum[n]/all_sum[n+len(all_sum)//2])*100
+        newAllSum.append( (str(round(girlRate,1)) + '%').replace('0.0%','-') )
+        newAllSum.append(all_sum[n+len(all_sum)//2])
+    newAllSum.insert(0,newAllSum.pop())
+    newAllSum.insert(0,newAllSum.pop())
+    result2.ix[('不分管理職','合計'),:]=newAllSum
+
+    #all_sum.index = ('各年齡合計','各年齡合計') 
+    #result2.append(all_sum)
     management.append(result2)
 
     #專業職人員
 
-    target = inputList[29:59]
+    target = inputList[59:89]
     ageCol = ['35歲以下', '36-45歲', '46-55歲', '56-65歲', '66歲以上']
     level = ['初階專業職','中階專業職','高階專業職']
     result2 = pd.DataFrame()
-    for i in range(3):
+    all_sum = []
+    for k in range(3):
 
-        data = result[target[i*10:i*10+10]].astype(int)
+        data = result[target[k*10:k*10+10]].astype(int)
         col = list(data.columns)
         index = list(data.index)
 
@@ -512,10 +472,20 @@ for i in range(9):
         girl = data[col[5:]]
         girl.columns = ageCol
         member = member.T
-        member.at['合計'] = list(member.sum())
+        member.at['各年齡合計'] = list(member.sum())
         member = member.astype(int)
+        if(member_sum):
+            member_sum = list(member.loc['各年齡合計'])
+        else:
+            member_sum += list(member.loc['各年齡合計'])
+        
         girl=girl.T
-        girl.at['合計'] = list(girl.sum())
+        girl.at['各年齡合計'] = list(girl.sum())
+        if(girl_sum):
+            girl_sum = list(girl.loc['各年齡合計'])
+        else:
+            girl_sum += list(girl.loc['各年齡合計'])
+        
         girlRate = (girl/member)*100
         girlRate = girlRate.fillna(0)
 
@@ -533,12 +503,30 @@ for i in range(9):
         index = list(girlRate.index)
         index.insert(0,index.pop())
         result1 = result1.reindex(index=index)
-        result1.index = [ [level[i]]*len(index) , index]
+        
+        result1.index = [ [level[k]]*len(index) , index]
         if(result2.empty):
             result2 = result1.copy()
         else:
             result2 = pd.concat([result2,result1],axis=0)
 
+        if(not all_sum):
+            all_sum = girl_sum + member_sum
+        else:
+            tempAllSum = girl_sum + member_sum
+            for n in range(len(all_sum)):
+                all_sum[n]+=tempAllSum[n] 
+        
+#all_sum.append(all_sum.pop(0))
+#all_sum.append(all_sum.pop(0))
+    newAllSum = []
+    for n in range(len(all_sum)//2):
+        girlRate = (all_sum[n]/all_sum[n+len(all_sum)//2])*100
+        newAllSum.append( (str(round(girlRate,1)) + '%').replace('0.0%','-') )
+        newAllSum.append(all_sum[n+len(all_sum)//2])
+    newAllSum.insert(0,newAllSum.pop())
+    newAllSum.insert(0,newAllSum.pop())
+    result2.ix[('不分專業職','合計'),:]=newAllSum
     professional.append(result2)    
 
 
@@ -570,8 +558,8 @@ for i in range(2):
     girl = girl.T
     girl.at['各年小計'] = list(girl.sum())
     member = (boy+girl).astype(int)
-    girlRate = girlRate.T
     girlRate = (girl/member)*100
+    #girlRate = girlRate.T
     girlRate = girlRate.fillna(0)
     girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
     column = list(member.columns) 
@@ -592,27 +580,34 @@ for i in range(2):
 
 col = ['哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']
 
-result = inputList[['1.單位名稱','哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']]
+result = statData[['1.單位名稱','哺集乳室','女性生理假（不扣薪）','Third Choice托嬰服務（指設有收托二歲以下兒童之服務機構）','托兒服務（指設有收托二歲至六歲兒童之服務機構）','育兒津貼','（因照顧家庭因素可申請）彈性工時']]
 
 answer = pd.DataFrame(columns=col)
-answerList = []
+
 for name in category:
-    
+    answerList = []
     try:
         result1 = ct.group_table(result,'1.單位名稱',[name])
     except:
         continue
     result1 = result1.fillna(0).drop('1.單位名稱',axis=1).reset_index(drop=True)
+ 
     for item in col:
         count=0
-        for i in range(len(result[item])):
-            if (result[item][i] is not 0):
+
+        for i in range(len(result1[item])):
+            if (result1[item][i] is not 0):
                 count+=1
             
         answerList.append(count)
-    
+
     answer.at[name] = answerList
 
+answer.at['產官研合計'] = list(answer.sum())
+answer = answer.T
+column = list(answer.columns)
+column.insert(0,column.pop()) #尾換到頭
+answer = (answer[column]).astype(int)
 
 with pd.ExcelWriter('單位版分析.xlsx') as writer:
     reportData.to_excel(writer,sheet_name='回報參數',encoding='utf_8_sig')
@@ -623,3 +618,6 @@ with pd.ExcelWriter('單位版分析.xlsx') as writer:
         management_seniority[i].to_excel(writer,sheet_name=str(i+1)+'.'+theme[i]+'管理職服務年資',encoding='utf_8_sig')
         management[i].to_excel(writer,sheet_name=str(i+1)+'.'+theme[i]+'各階管理職人數',encoding='utf_8_sig')
         professional[i].to_excel(writer,sheet_name=str(i+1)+'.'+theme[i]+'各階專業職人數',encoding='utf_8_sig')
+    resultList[0].to_excel(writer,sheet_name=title[0],encoding='utf_8_sig')
+    resultList[1].to_excel(writer,sheet_name=title[1],encoding='utf_8_sig')
+    answer.to_excel(writer,sheet_name='各機構已實施之福利措施',encoding='utf_8_sig')
