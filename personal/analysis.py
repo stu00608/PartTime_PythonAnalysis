@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal")
 
 os.getcwd()
 
@@ -10,8 +10,8 @@ import ct_tool as ct
 
 statData = pd.read_csv("001.csv")
 statData = statData.dropna(axis=1,how='all')
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/personal/outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\personal\outputs")
 os.getcwd()
 
 #把性別跟學歷的"其他"刪除
@@ -75,14 +75,7 @@ result.columns = [ sorted(['博士','碩士','大學/大專','專科','高職','
 
 result = result[['合計','博士','碩士','大學/大專','專科','高職']]
 
-ct1 = ct1.rename(index={'All':'各年齡合計'})
-ct1.columns.names=["年齡","性別"]
-ct1.index.name = "最高學歷"
-ct1 = ct1.reindex(['博士','碩士','大學/大專','專科','高職','合計'])
-ct1 = ct1/ct1['小計'][-1]
-ct1 = ((ct1*100).round(1).astype(str)+'%').replace('0.0%','-')
-
-resultCSV.append(ct1)
+resultCSV.append(result)
 # ct1.to_csv('2.學歷.csv',encoding='utf_8_sig')
 
 #畢業校系O
