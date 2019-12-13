@@ -3,8 +3,8 @@ import os
 import re
 import numpy as np
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -46,8 +46,8 @@ for i in range(len(statData['1.單位名稱'])):
 statData = statData.drop(delList).reset_index(drop=True)
 
 
-os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-#os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+# os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
 os.getcwd()
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
@@ -178,6 +178,7 @@ reportData.at['產小計'] = resultList.count('產小計')
 reportData.at['官小計'] = resultList.count('官小計')
 reportData.at['研小計'] = resultList.count('研小計')
 
+nameCheck_statData = statData.copy()
 
 i=0
 delList = []
@@ -393,6 +394,8 @@ for i in range(9):
     level = ['初階管理職','中階管理職','高階管理職']
     result2 = pd.DataFrame()
     all_sum = []
+    member_sum = []
+    girl_sum = []
     for k in range(3):
 
         data = result[target[k*10:k*10+10]].astype(int)
@@ -474,6 +477,8 @@ for i in range(9):
     level = ['初階專業職','中階專業職','高階專業職']
     result2 = pd.DataFrame()
     all_sum = []
+    member_sum = []
+    girl_sum = []
     for k in range(3):
 
         data = result[target[k*10:k*10+10]].astype(int)
@@ -627,12 +632,28 @@ column.insert(0,column.pop()) #尾換到頭
 answer = (answer[column]).astype(int)
 
 #第四部分
-df = ct.group_table(statData,'請選擇:',['有']).reset_index(drop=True)
+df = ct.group_table(nameCheck_statData,'請選擇:',['有']).reset_index(drop=True)
+df_count = ct.group_table(statData,'請選擇:',['有']).reset_index(drop=True)
 df = df[['1.單位名稱','(a) 請問此轉任情況是否是少數個案？','(b) 貴單位是否有鼓勵轉任之機制？若有請說明','1-1. 該轉任是否於貴單位服務期間發生？','1-2 現任工程職務為：','1-3\t原專長領域為：','1-4 此轉任事例已於現職服務幾年?','是否有下一位?','2-1. 該轉任是否於貴單位服務期間發生？','2-2 現任工程職務為：','2-3\t原專長領域為：','2-4 此轉任事例已於現職服務幾年?','是否有下一位??','3-1. 該轉任是否於貴單位服務期間發生？','3-2 現任工程職務為：','3-3\t原專長領域為：','3-3\t原專長領域為：.1','3-4 此轉任事例已於現職服務幾年?','是否有下一位??..','4-1. 該轉任是否於貴單位服務期間發生？','4-2 現任工程職務為：','4-3\t原專長領域為：','4-4 此轉任事例已於現職服務幾年?',]]
-
+df_count = df_count[['1.單位名稱','(a) 請問此轉任情況是否是少數個案？','(b) 貴單位是否有鼓勵轉任之機制？若有請說明','1-1. 該轉任是否於貴單位服務期間發生？','1-2 現任工程職務為：','1-3\t原專長領域為：','1-4 此轉任事例已於現職服務幾年?','是否有下一位?','2-1. 該轉任是否於貴單位服務期間發生？','2-2 現任工程職務為：','2-3\t原專長領域為：','2-4 此轉任事例已於現職服務幾年?','是否有下一位??','3-1. 該轉任是否於貴單位服務期間發生？','3-2 現任工程職務為：','3-3\t原專長領域為：','3-3\t原專長領域為：.1','3-4 此轉任事例已於現職服務幾年?','是否有下一位??..','4-1. 該轉任是否於貴單位服務期間發生？','4-2 現任工程職務為：','4-3\t原專長領域為：','4-4 此轉任事例已於現職服務幾年?',]]
 yes = ct.group_table(df,'(a) 請問此轉任情況是否是少數個案？',['是，請跳答第（四）題'])
-no = ct.group_table(df,'(a) 請問此轉任情況是否是少數個案？',['否，請續答本題(b)'])
 
+result = pd.DataFrame(columns = ['此轉任情況是少數個案'])
+result.at['產小計'] = list(df_count['1.單位名稱']).count('產小計')
+result.at['官小計'] = list(df_count['1.單位名稱']).count('官小計')
+result.at['研小計'] = list(df_count['1.單位名稱']).count('研小計')
+result.at['產官研合計'] = list(result.sum())
+
+dataList = ['(b) 貴單位是否有鼓勵轉任之機制？若有請說明','1-1. 該轉任是否於貴單位服務期間發生？','1-2 現任工程職務為：','1-3\t原專長領域為：','1-4 此轉任事例已於現職服務幾年?','是否有下一位?']
+FourList = []
+i=0
+temp = pd.DataFrame(columns = ['單位',item])
+temp['單位'] = df['1.單位名稱']
+for item in ['單位是否有鼓勵轉任之機制？若有請說明','該少數個案事例是否於貴單位服務期間發生','該少數個案現任工程職務為','該少數個案事例原專長領域為','此轉任事例已於現職服務幾年','是否有下一位?']:
+    
+    temp[item] = df[dataList[i]].reset_index(drop=True)
+    i+=1
+    temp = temp.sort_values(by=['單位']).fillna('無').reset_index(drop=True)
 
 with pd.ExcelWriter('單位版分析.xlsx') as writer:
     reportData.to_excel(writer,sheet_name='回報參數',encoding='utf_8_sig')
@@ -646,3 +667,4 @@ with pd.ExcelWriter('單位版分析.xlsx') as writer:
     resultList[0].to_excel(writer,sheet_name=title[0],encoding='utf_8_sig')
     resultList[1].to_excel(writer,sheet_name=title[1],encoding='utf_8_sig')
     answer.to_excel(writer,sheet_name='各機構已實施之福利措施',encoding='utf_8_sig')
+    temp.to_excel(writer,sheet_name='單位是否有非工程與科技領域背景人員轉任工程職務之事例',encoding='utf_8_sig')
