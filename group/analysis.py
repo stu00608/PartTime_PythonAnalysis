@@ -144,9 +144,40 @@ reportData.at['其他機構重複回填數'] = len(delUnit)-delUnit.count('水�
 
 reportData.at['其他資訊'] = '---'
 reportData.at['填答單位數'] = allUnit
-reportData.at['有效單位數'] = len(list(statData.index))
+reportData.at['有效單位數'] = allUnit - reportData.loc['水利署總回填數'] - reportData.loc['公路總局總回填數'] - reportData.loc['台灣電力股份有限公司總回填數'] - reportData.loc['其他機構重複回填數'] + 3
+
 
 category = ['研小計','官小計','產小計']
+
+companyCount = statData.copy()
+companyCount = list(companyCount['1.單位名稱'])
+resultList = []
+
+for i in range(len(companyCount)):
+    if(companyCount[i] in resultList):
+        continue
+    else:
+        resultList.append(companyCount[i])
+
+delList = []
+for i in range(len(resultList)):
+    if( classification[0].count(resultList[i])>=1 ):
+        resultList[i]='產小計'
+    elif(classification[1].count(resultList[i])>=1):
+        resultList[i]='研小計'
+    elif(classification[2].count(resultList[i])>=1):
+        resultList[i]='官小計'
+    else:
+        delList.append(i)
+        #statData.at[j,'1.單位名稱']='其他'
+
+
+
+reportData.at['總機構數'] = len(resultList)
+reportData.at['產小計'] = resultList.count('產小計')
+reportData.at['官小計'] = resultList.count('官小計')
+reportData.at['研小計'] = resultList.count('研小計')
+
 
 i=0
 delList = []
@@ -159,24 +190,13 @@ for j in range(len(statData['1.單位名稱'])):
         statData.at[j,'1.單位名稱']='官小計'
     else:
         lost_company.at[i] = statData['1.單位名稱'][j]
-        delList.append(statData['1.單位名稱'][j])
+        delList.append(j)
         i+=1
         #statData.at[j,'1.單位名稱']='其他'
         
-
+statData = statData.drop(delList,axis=0).reset_index(drop=True)
 
 num = ['50人以下','50~250人','250人以上']
-
-# for i in range(len(statData)):
-#     v1 = int(statData['2.單位總員工人數'][i])
-#     if( v1<=49 and v1>=1) :
-#         statData.at[i,'2.單位總員工人數'] = num[0]
-#     elif( v1>49 and v1<250 ):
-#         statData.at[i,'2.單位總員工人數'] = num[1]
-#     elif( v1>249 ):
-#         statData.at[i,'2.單位總員工人數'] = num[2]
-#     else:
-#         statData.at[i,'2.單位總員工人數']=None
 
 #---main---#
 
@@ -191,6 +211,8 @@ colname3 = [ ['土木營建','土木營建','建築、都市規劃','建築、�
 colname4 = [ ['女性佔比']*15+['總人數']*15,(['初階專業職']*5+['中階專業職']*5+['高階專業職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
 theme = ['土木營建','建築、都市規劃','電子電機','資訊通訊','化工材料','生技醫工','環工綠能','機械','其他']
+
+
 
 
 #All
@@ -285,14 +307,6 @@ for i in range(9):
 
     col = inputList[3:]
     result = pd.DataFrame(columns=col)
-
-    # for name in num:
-    #     try:
-    #         df1 = ct.group_table(df,'2.單位總員工人數',[name])
-    #     except:
-    #         continue
-    #     df1 = pd.DataFrame(data=df1[col].sum(),columns=[name])
-    #     result.at[name]=list(df1[name])
 
     for name in category:
         try:
@@ -522,7 +536,10 @@ for i in range(9):
     newAllSum = []
     for n in range(len(all_sum)//2):
         girlRate = (all_sum[n]/all_sum[n+len(all_sum)//2])*100
-        newAllSum.append( (str(round(girlRate,1)) + '%').replace('0.0%','-') )
+        newStr = (str(round(girlRate,1)) + '%')
+        if( newStr == '0.0%' ):
+            newStr.replace('0.0%','-')
+        newAllSum.append( newStr )
         newAllSum.append(all_sum[n+len(all_sum)//2])
     newAllSum.insert(0,newAllSum.pop())
     newAllSum.insert(0,newAllSum.pop())
@@ -608,6 +625,14 @@ answer = answer.T
 column = list(answer.columns)
 column.insert(0,column.pop()) #尾換到頭
 answer = (answer[column]).astype(int)
+
+#第四部分
+df = ct.group_table(statData,'請選擇:',['有']).reset_index(drop=True)
+df = df[['1.單位名稱','(a) 請問此轉任情況是否是少數個案？','(b) 貴單位是否有鼓勵轉任之機制？若有請說明','1-1. 該轉任是否於貴單位服務期間發生？','1-2 現任工程職務為：','1-3\t原專長領域為：','1-4 此轉任事例已於現職服務幾年?','是否有下一位?','2-1. 該轉任是否於貴單位服務期間發生？','2-2 現任工程職務為：','2-3\t原專長領域為：','2-4 此轉任事例已於現職服務幾年?','是否有下一位??','3-1. 該轉任是否於貴單位服務期間發生？','3-2 現任工程職務為：','3-3\t原專長領域為：','3-3\t原專長領域為：.1','3-4 此轉任事例已於現職服務幾年?','是否有下一位??..','4-1. 該轉任是否於貴單位服務期間發生？','4-2 現任工程職務為：','4-3\t原專長領域為：','4-4 此轉任事例已於現職服務幾年?',]]
+
+yes = ct.group_table(df,'(a) 請問此轉任情況是否是少數個案？',['是，請跳答第（四）題'])
+no = ct.group_table(df,'(a) 請問此轉任情況是否是少數個案？',['否，請續答本題(b)'])
+
 
 with pd.ExcelWriter('單位版分析.xlsx') as writer:
     reportData.to_excel(writer,sheet_name='回報參數',encoding='utf_8_sig')
