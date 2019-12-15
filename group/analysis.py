@@ -15,11 +15,11 @@ import ct_tool as ct
 classification = [] 
 data = pd.read_excel("004.xlsx",sheet_name=2,usecols=[1]) #產
 data = list(data['單位'])
-data += ['國際聯合科技','國際聯合科技股份有限公司','鼎原科技股份有限公司','國際聯合科技','國際聯合科技股份有限公司','世紀離岸風電設備股份有限公司','主動元件事業處','連展科技股份有限公司連接器事業處研發部','呈峰營造','台科大第一宿舍拆除重建工程','泰誠發展營造股份有限公司','點晶科技股份有限公司','環球水泥股份有限公司','中鋼','聚和國際','國光生物科技股份有限公司','鼎漢國際工程顧問公司','台化工務部設計組','台灣自來水公司中區工程處']
+data += ['統一麻豆廠','食品製造業','國際聯合科技','國際聯合科技股份有限公司','鼎原科技股份有限公司','國際聯合科技','國際聯合科技股份有限公司','世紀離岸風電設備股份有限公司','主動元件事業處','連展科技股份有限公司連接器事業處研發部','呈峰營造','台科大第一宿舍拆除重建工程','泰誠發展營造股份有限公司','點晶科技股份有限公司','環球水泥股份有限公司','中鋼','聚和國際','國光生物科技股份有限公司','鼎漢國際工程顧問公司','台化工務部設計組','台灣自來水公司中區工程處','曾文工務段']
 classification.append(data)
 data = pd.read_excel("004.xlsx",sheet_name=1,usecols=[0]) #研
 data = list(data['單位'])
-['財團法人中華顧問工程司','財團法人臺灣營建研究院','財團法人國家實驗研究院','財團法人食品工業發展研究所','財團法人國家同步輻射研究中心']
+data += ['財團法人農業科技研究院','研發','財團法人中華顧問工程司','財團法人臺灣營建研究院','財團法人國家實驗研究院','財團法人食品工業發展研究所','財團法人國家同步輻射研究中心']
 classification.append(data)
 data = pd.read_excel("004.xlsx",sheet_name=0,usecols=[1]) #官
 data = list(data['單位'])
@@ -98,23 +98,58 @@ for i in range(len(statData['1.單位名稱'])):
 nameCheck_statData = statData.copy()
 
 water = ['經濟部水利署']
-road = ['公路總局','公路局第五區養護工程處-阿里山工務段','新化','埔里工務段','西濱北工處第七工務段','西部濱海公路南區臨時工程處第六工務段','第二區養護工程處台中段','新化工務段','交通部第五區養護工程處新化工務段','西濱北工處工務段','蘇花公路改善工程處勞安科','埔里工務段','埔里工務段','西部濱海公路北區臨時工程處第一工務段','港灣工程部']
+road = ['公路總局','曾文工務段','公路局第五區養護工程處-阿里山工務段','新化','埔里工務段','西濱北工處第七工務段','西部濱海公路南區臨時工程處第六工務段','第二區養護工程處台中段','新化工務段','交通部第五區養護工程處新化工務段','西濱北工處工務段','蘇花公路改善工程處勞安科','埔里工務段','埔里工務段','西部濱海公路北區臨時工程處第一工務段','港灣工程部']
 electronic = ['台灣電力','臺灣電力','台電','臺電']
 
-for i in range(len(statData['1.單位名稱'])):
+unitList = [ [],[],[],[] ]
+name = [ '水利署','公路總局','台灣電力股份有限公司','其他' ]
+checkFlag = False
 
+for i in range(len(statData['1.單位名稱'])):
+    checkFlag = False
     for item in water:
         if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
             statData.at[i,'1.單位名稱']='水利署'
+            unitList[0].append(i)
             j+=1
+            checkFlag = True
+    if(checkFlag):
+        continue
     for item in road:
         if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
             statData.at[i,'1.單位名稱']='公路總局'
+            unitList[1].append(i)    
             k+=1
+            checkFlag = True
+    if(checkFlag):
+        continue
     for item in electronic:
         if(   str(statData['1.單位名稱'][i]).find(item) != -1 ):
             statData.at[i,'1.單位名稱']='台灣電力股份有限公司'
+            unitList[2].append(i)
             m+=1
+            checkFlag = True
+    if(checkFlag):
+        continue
+    else:
+        unitList[3].append(i)
+
+with pd.ExcelWriter('單位版回填單位.xlsx') as writer:
+    z=0
+    for unit in unitList:
+        temp = nameCheck_statData.loc[unit].reset_index(drop=True).copy()
+        tempList = []
+        delList = []
+        
+        for i in range(len(temp['1.單位名稱'])):
+            if(temp['1.單位名稱'][i] in tempList):
+                delList.append(i)
+            else:
+                tempList.append(temp['1.單位名稱'][i])
+        temp = temp.drop(delList,axis=0)
+        temp[['1.單位名稱','2.單位總員工人數']].to_excel(writer,sheet_name=name[z]+'回填機構',encoding='utf_8_sig')
+        z+=1
+
 
 delList = []
 for item in alreadyExistDict:
@@ -150,33 +185,42 @@ reportData.at['有效單位數'] = allUnit - reportData.loc['水利署總回填�
 category = ['研小計','官小計','產小計']
 
 companyCount = statData.copy()
-companyCount = list(companyCount['1.單位名稱'])
-resultList = []
 
+resultList = []
+delList = []
 for i in range(len(companyCount)):
-    if(companyCount[i] in resultList):
+    if(companyCount['1.單位名稱'][i] in resultList):
+        delList.append(i)
         continue
     else:
-        resultList.append(companyCount[i])
+        
+        resultList.append(companyCount['1.單位名稱'][i])
+
+companyCount = companyCount.drop(delList).reset_index(drop=True)
 
 delList = []
-for i in range(len(resultList)):
-    if( classification[0].count(resultList[i])>=1 ):
+unitClassification = [ [],[],[] ]
+for i in range(len(companyCount)):
+    if( classification[0].count(companyCount['1.單位名稱'][i])>=1 ):
+        unitClassification[0].append(i)
         resultList[i]='產小計'
-    elif(classification[1].count(resultList[i])>=1):
+    elif(classification[1].count(companyCount['1.單位名稱'][i])>=1):
+        unitClassification[1].append(i)
         resultList[i]='研小計'
-    elif(classification[2].count(resultList[i])>=1):
+    elif(classification[2].count(companyCount['1.單位名稱'][i])>=1):
+        unitClassification[2].append(i)
         resultList[i]='官小計'
     else:
         delList.append(i)
         #statData.at[j,'1.單位名稱']='其他'
 
-
+(companyCount.loc[delList])[['1.單位名稱','2.單位總員工人數']].to_excel('單位版其他單位.xlsx',sheet_name='產官研以外回填機構',encoding='utf_8_sig')
 
 reportData.at['總機構數'] = len(resultList)
 reportData.at['產小計'] = resultList.count('產小計')
 reportData.at['官小計'] = resultList.count('官小計')
 reportData.at['研小計'] = resultList.count('研小計')
+reportData.at['其他'] = len(resultList)-resultList.count('產小計')-resultList.count('官小計')-resultList.count('研小計')
 
 nameCheck_statData = statData.copy()
 
@@ -252,12 +296,12 @@ boy.columns = theme+['非工程與科技領域']
 girl = result[col[10:]]
 girl.columns = theme+['非工程與科技領域']
 member = (boy+girl).astype(int)
+member.at['產官研合計'] = list(member.sum())
+girl.at['產官研合計'] = list(girl.sum())
 girlRate = (girl/member)*100
 girlRate = girlRate.fillna(0)
-temp = (girl/member).fillna(0)
 member.at['產官研合計'] = list(member.sum())
 member = member.astype(int)
-girlRate.at['產官研合計'] = list(girlRate.sum())
 girlRate = (girlRate.round(1).astype(str) + '%').replace('0.0%','-')
 
 result = pd.DataFrame(index=list(girlRate.index))
@@ -267,15 +311,26 @@ for i in range(len(theme)):
 
 result['非工程與科技領域'+str(0)]=girlRate['非工程與科技領域']
 result['非工程與科技領域'+str(1)]=member['非工程與科技領域']
-
-temp = pd.concat([temp,member],axis=1,sort=True)
-member_analysis_n = temp
 result.columns = colname3
 result.columns.names = ['','']
 member_analysis = result.copy()
 index = list(member_analysis.index)
 index.insert(0,index.pop())
 member_analysis = member_analysis.reindex(index=index)
+sList1 = list(girl.T.sum())
+sList2 = list(member.T.sum())
+sList = []
+name = ['研','官','產']
+reportData.at['人數'] = '---'
+for i in range(len(sList1)-1):
+    reportData.at[name[i]+'人數'] = sList2[i]
+    sList.append((str(round(sList1[i]/sList2[i]*100,1))+'%').replace('0.0%','-'))
+reportData.at['女性占比'] = '---'
+for i in range(len(sList1)-1):
+    reportData.at[name[i]+'女性占比'] = sList[i]
+s = list(girl.T.sum())[-1] / list(member.T.sum())[-1] * 100
+reportData.at['總女性占比'] = (str(round(s,1))+'%').replace('0.0%','-')
+reportData.at['總人數'] = list(member.T.sum())[-1]
 #result1.to_csv('總人數分析.csv',encoding='utf_8_sig')
 
 #------------------------#
