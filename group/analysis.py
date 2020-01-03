@@ -62,7 +62,7 @@ allUnit = len(list(statData.index))
 zero = statData[['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']].copy()
 zero = zero.loc[0]
 result = zero.copy()
-for i in range(1,len(18)):
+for i in range(1,18):
     temp = statData[['服務年資1~5年.'+str(i),'服務年資6~10年.'+str(i),'服務年資11~15年.'+str(i),'服務年資16~20年.'+str(i),'服務年資21~25年.'+str(i),'服務年資25年以上.'+str(i)]].copy()
 
 
@@ -265,6 +265,100 @@ colname3 = [ ['土木營建','土木營建','建築、都市規劃','建築、�
 colname4 = [ ['女性佔比']*15+['總人數']*15,(['初階專業職']*5+['中階專業職']*5+['高階專業職']*5)*2,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*6 ]
 
 theme = ['土木營建','建築、都市規劃','電子電機','資訊通訊','化工材料','生技醫工','環工綠能','機械','其他']
+
+
+#---回送給單位之處理---# use nameCheck_statData
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/ReportExcel")
+for i in range(len(nameCheck_statData)):
+    reportData = []
+    processData = nameCheck_statData.loc[i].copy()
+    #服務年資
+    processDataFrame = pd.DataFrame(columns=[['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']*2])
+    k=0
+    for j in range(35,35+len(theme)*12,12):
+        processDataFrame.at[theme[k]] = list(map(int,processData[j:j+12]))
+        k+=1
+    reportData.append(processDataFrame)
+    #管理職年資
+    processDataFrame = pd.DataFrame(columns=[['管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上']*2])
+    k=0
+    for j in range(35+len(theme)*12,35+len(theme)*12+len(theme)*12,12):
+        processDataFrame.at[theme[k]] = list(map(int,processData[j:j+12]))
+        k+=1
+    reportData.append(processDataFrame)
+    #管理職人數
+    tempProcessDataFrame = []
+    #初
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(35+len(theme)*12+len(theme)*12,35+len(theme)*12+len(theme)*12+len(theme)*10,10):
+        tempProcessDataFrame[0].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    #中
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,10):
+        tempProcessDataFrame[1].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    #高
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10,10):
+        tempProcessDataFrame[2].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    
+    processDataFrame = pd.concat([tempProcessDataFrame[0],tempProcessDataFrame[1]],axis=0)
+    processDataFrame = pd.concat([processDataFrame,tempProcessDataFrame[2]],axis=0)
+
+    
+    reportData.append(processDataFrame)
+    t = 35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10
+    #專業職人數
+    tempProcessDataFrame = []
+    #初
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(t,t+len(theme)*10,10):
+        tempProcessDataFrame[0].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    t+=len(theme)*10
+    #中
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(t,t+len(theme)*10,10):
+        tempProcessDataFrame[1].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    t+=len(theme)*10
+    #高
+    tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
+    k=0
+    for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10,10):
+        tempProcessDataFrame[2].at[theme[k]] = list(map(int,processData[j:j+10]))
+        k+=1
+    
+    processDataFrame = pd.concat([tempProcessDataFrame[0],tempProcessDataFrame[1]],axis=0)
+    processDataFrame = pd.concat([processDataFrame,tempProcessDataFrame[2]],axis=0)
+    
+    reportData.append(processDataFrame)
+    t+=len(theme)*10
+
+    #請假
+    processDataFrame = pd.DataFrame(columns=[ ['106年 請假人次','107年 請假人次','108年 請假人次']*2 ])
+    k=0
+    for j in range(t,t+12,6):
+        processDataFrame.at[k] = list(map(int,processData[j:j+6]))
+        k+=1
+    
+    reportData.append(processDataFrame)
+    with pd.ExcelWriter(processData[0]+'.xlsx') as writer:
+        reportData[0].to_excel(writer,sheet_name='服務年資',encoding='utf_8_sig')
+        reportData[1].to_excel(writer,sheet_name='管理職年資',encoding='utf_8_sig')
+        reportData[2].to_excel(writer,sheet_name='管理職人數',encoding='utf_8_sig')
+        reportData[3].to_excel(writer,sheet_name='專業職人數',encoding='utf_8_sig')
+        reportData[4].to_excel(writer,sheet_name='請假人數',encoding='utf_8_sig')
+    
+
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs") 
 
 
 
