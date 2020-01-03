@@ -3,8 +3,8 @@ import os
 import re
 import numpy as np
 
-#os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -46,8 +46,8 @@ for i in range(len(statData['1.單位名稱'])):
 statData = statData.drop(delList).reset_index(drop=True)
 
 
-# os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
 os.getcwd()
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
@@ -55,6 +55,15 @@ os.getcwd()
 reportData = pd.DataFrame(columns=['回報資料'])
 lost_company = pd.DataFrame(columns=['其他歸類單位'])
 allUnit = len(list(statData.index))
+
+#test
+
+#第0項
+zero = statData[['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']].copy()
+zero = zero.loc[0]
+result = zero.copy()
+for i in range(1,len(18)):
+    temp = statData[['服務年資1~5年.'+str(i),'服務年資6~10年.'+str(i),'服務年資11~15年.'+str(i),'服務年資16~20年.'+str(i),'服務年資21~25年.'+str(i),'服務年資25年以上.'+str(i)]].copy()
 
 
 #數字檢測(把float獨立出來檢查)
