@@ -47,8 +47,10 @@ statData = statData.drop(delList).reset_index(drop=True)
 
 
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\check")
 os.getcwd()
+
+statData.to_excel('testInput.xlsx',encoding='utf_8_sig')
 
 #土木營建  建築、都市規劃 電子電機 資訊通訊 化工材料 生技醫工 環工綠能 機械 其他
 
@@ -270,8 +272,8 @@ theme = ['土木營建','建築、都市規劃','電子電機','資訊通訊','�
 #---回送給單位之處理---# use nameCheck_statData
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/ReportExcel")
 os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\ReportExcel")
-# for i in range(len(nameCheck_statData)):
-for i in range(5):
+for i in range(len(nameCheck_statData)):
+# for i in range(5):
 
     reportData_Unit = []
     processData = nameCheck_statData.loc[i].copy()
@@ -397,7 +399,7 @@ for i in range(5):
     
 
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs") 
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\check")
 
 
 
