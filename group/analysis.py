@@ -3,8 +3,8 @@ import os
 import re
 import numpy as np
 
-# os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
-os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group")
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group")
 os.getcwd()
 
 import ct_tool as ct
@@ -46,8 +46,13 @@ for i in range(len(statData['1.單位名稱'])):
 statData = statData.drop(delList).reset_index(drop=True)
 
 
+<<<<<<< HEAD
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
 os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\check")
+=======
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs")
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+>>>>>>> 1a16856f50090c40545f685693ebf9ea898d5163
 os.getcwd()
 
 statData.to_excel('testInput.xlsx',encoding='utf_8_sig')
@@ -270,10 +275,17 @@ theme = ['土木營建','建築、都市規劃','電子電機','資訊通訊','�
 
 
 #---回送給單位之處理---# use nameCheck_statData
+<<<<<<< HEAD
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/ReportExcel")
 os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\ReportExcel")
 for i in range(len(nameCheck_statData)):
 # for i in range(5):
+=======
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs/ReportExcel")
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\ReportExcel")
+# for i in range(len(nameCheck_statData)):
+for i in range(5):
+>>>>>>> 1a16856f50090c40545f685693ebf9ea898d5163
 
     reportData_Unit = []
     processData = nameCheck_statData.loc[i].copy()
@@ -285,11 +297,14 @@ for i in range(len(nameCheck_statData)):
         processDataFrame.at[theme[k]] = processData[j+15]+processData[j+15+10]
         k+=1
     processDataFrame.at['非工程領域'] = processData[24]+processData[34]
+    processDataFrame.at['總人數'] = int(processDataFrame.sum())
+        
     reportData_Unit.append(processDataFrame)
 
     #基本資料
 
     processDataFrame = pd.DataFrame(data=processData[0:5])
+    processDataFrame.columns = ['基本資料']
     reportData_Unit.append(processDataFrame)
 
 
@@ -299,6 +314,8 @@ for i in range(len(nameCheck_statData)):
     for j in range(35,35+len(theme)*12,12):
         processDataFrame.at[theme[k]] = list(map(int,processData[j:j+12]))
         k+=1
+    processDataFrame.at['合計'] = list(processDataFrame.sum())
+    processDataFrame.columns = [ ['男性']*6+['女性']*6,['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']*2 ]
     reportData_Unit.append(processDataFrame)
     #管理職年資
     processDataFrame = pd.DataFrame(columns=[['管理職年資1~5年','管理職年資6~10年','管理職年資11~15年','管理職年資16~20年','管理職年資21~25年','管理職年資25年以上']*2])
@@ -306,42 +323,60 @@ for i in range(len(nameCheck_statData)):
     for j in range(35+len(theme)*12,35+len(theme)*12+len(theme)*12,12):
         processDataFrame.at[theme[k]] = list(map(int,processData[j:j+12]))
         k+=1
+    processDataFrame.at['合計'] = list(processDataFrame.sum())
+    processDataFrame.columns = [ ['男性']*6+['女性']*6,['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']*2 ]
     reportData_Unit.append(processDataFrame)
-    #管理職人數
+    #管理職年齡
     tempProcessDataFrame = []
+    sumList = []
     #初
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
     k=0
     for j in range(35+len(theme)*12+len(theme)*12,35+len(theme)*12+len(theme)*12+len(theme)*10,10):
         tempProcessDataFrame[0].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
+    sumList.append(list(tempProcessDataFrame[0].sum().astype(int))) 
+    tempProcessDataFrame[0].at['小計'] = list(tempProcessDataFrame[0].sum())
+    tempProcessDataFrame[0].index = [['初階']*(len(theme)+1),theme+['小計']]
+
     #中
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
     k=0
     for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,10):
         tempProcessDataFrame[1].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
+    sumList.append(list(tempProcessDataFrame[1].sum().astype(int))) 
+    tempProcessDataFrame[1].at['小計'] = list(tempProcessDataFrame[1].sum())
+    tempProcessDataFrame[1].index = [['中階']*(len(theme)+1),theme+['小計']]
     #高
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
     k=0
     for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10,10):
         tempProcessDataFrame[2].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
-    
+    sumList.append(list(tempProcessDataFrame[2].sum().astype(int))) 
+    tempProcessDataFrame[2].at['小計'] = list(tempProcessDataFrame[2].sum())
+    tempProcessDataFrame[2].index = [['高階']*(len(theme)+1),theme+['小計']]
+
     processDataFrame = pd.concat([tempProcessDataFrame[0],tempProcessDataFrame[1]],axis=0)
     processDataFrame = pd.concat([processDataFrame,tempProcessDataFrame[2]],axis=0)
+    processDataFrame.columns = [ ['男性']*5+['女性']*5,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]
+    processDataFrame.at['合計'] = np.sum([ sumList[i] for i in range(3) ],axis=0)
 
-    
     reportData_Unit.append(processDataFrame)
     t = 35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10
-    #專業職人數
+    #專業職年齡
     tempProcessDataFrame = []
+    sumList = []
     #初
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
     k=0
     for j in range(t,t+len(theme)*10,10):
         tempProcessDataFrame[0].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
+    sumList.append(list(tempProcessDataFrame[0].sum().astype(int))) 
+    tempProcessDataFrame[0].at['小計'] = list(tempProcessDataFrame[0].sum())
+    tempProcessDataFrame[0].index = [['初階']*(len(theme)+1),theme+['小計']]
     t+=len(theme)*10
     #中
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
@@ -349,6 +384,9 @@ for i in range(len(nameCheck_statData)):
     for j in range(t,t+len(theme)*10,10):
         tempProcessDataFrame[1].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
+    sumList.append(list(tempProcessDataFrame[1].sum().astype(int))) 
+    tempProcessDataFrame[1].at['小計'] = list(tempProcessDataFrame[1].sum())
+    tempProcessDataFrame[1].index = [['中階']*(len(theme)+1),theme+['小計']]
     t+=len(theme)*10
     #高
     tempProcessDataFrame.append(pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]))
@@ -356,11 +394,16 @@ for i in range(len(nameCheck_statData)):
     for j in range(35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10,35+len(theme)*12+len(theme)*12+len(theme)*10+len(theme)*10+len(theme)*10,10):
         tempProcessDataFrame[2].at[theme[k]] = list(map(int,processData[j:j+10]))
         k+=1
+    sumList.append(list(tempProcessDataFrame[2].sum().astype(int))) 
+    tempProcessDataFrame[2].at['小計'] = list(tempProcessDataFrame[2].sum())
+    tempProcessDataFrame[2].index = [['高階']*(len(theme)+1),theme+['小計']]
 
     reg = tempProcessDataFrame[0].copy()
     processDataFrame = pd.concat([tempProcessDataFrame[0],tempProcessDataFrame[1]],axis=0)
     processDataFrame = pd.concat([processDataFrame,tempProcessDataFrame[2]],axis=0)
     reg2 = processDataFrame.copy()
+    processDataFrame.columns = [ ['男性']*5+['女性']*5,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ]
+    processDataFrame.at['合計'] = np.sum([ sumList[i] for i in range(3) ],axis=0)
     reportData_Unit.append(processDataFrame)
     t+=len(theme)*10
 
@@ -371,17 +414,18 @@ for i in range(len(nameCheck_statData)):
         processDataFrame.at[k] = list(map(int,processData[j:j+6]))
         k+=1
 
+    processDataFrame.index = [['1. 過去三年間貴單位獲准之育嬰留職停薪人次','2. 過去三年間貴單位獲准之家庭照謢假人次']]
+    processDataFrame.columns = [ ['男性']*3+['女性']*3,['106年 請假人次','107年 請假人次','108年 請假人次']*2 ]
     reportData_Unit.append(processDataFrame)
 
     #總員工年齡，空表格
 
-    processDataFrame = pd.DataFrame(columns=[ ['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ],index=list(reg.index))
+    processDataFrame = pd.DataFrame(columns=[ ['男性']*5+['女性']*5,['35歲以下','36-45歲','46-55歲','56-65歲','66歲以上']*2 ],index=theme+['小計'])
     reportData_Unit.append(processDataFrame)
-
 
     #專業職年資，空表格
 
-    processDataFrame = pd.DataFrame(columns=list(reg2.columns),index=list(reg2.index))
+    processDataFrame = pd.DataFrame(columns=[['男性']*6+['女性']*6,['服務年資1~5年','服務年資6~10年','服務年資11~15年','服務年資16~20年','服務年資21~25年','服務年資25年以上']*2],index=[['初階']*len(theme)+['中階']*len(theme)+['高階']*len(theme),theme+['小計']+theme+['小計']+theme+['小計']])
     reportData_Unit.append(processDataFrame)
 
     with pd.ExcelWriter(processData[0]+'.xlsx') as writer:
@@ -389,8 +433,8 @@ for i in range(len(nameCheck_statData)):
         reportData_Unit[1].to_excel(writer,sheet_name='基本資料',encoding='utf_8_sig')
         reportData_Unit[2].to_excel(writer,sheet_name='服務年資',encoding='utf_8_sig')
         reportData_Unit[3].to_excel(writer,sheet_name='管理職年資',encoding='utf_8_sig')
-        reportData_Unit[4].to_excel(writer,sheet_name='管理職人數',encoding='utf_8_sig')
-        reportData_Unit[5].to_excel(writer,sheet_name='專業職人數',encoding='utf_8_sig')
+        reportData_Unit[4].to_excel(writer,sheet_name='管理職年齡',encoding='utf_8_sig')
+        reportData_Unit[5].to_excel(writer,sheet_name='專業職年齡',encoding='utf_8_sig')
         reportData_Unit[6].to_excel(writer,sheet_name='請假人數',encoding='utf_8_sig')
         reportData_Unit[7].to_excel(writer,sheet_name='總員工年齡',encoding='utf_8_sig')
         reportData_Unit[8].to_excel(writer,sheet_name='專業職年資',encoding='utf_8_sig')
@@ -398,8 +442,13 @@ for i in range(len(nameCheck_statData)):
 
     
 
+<<<<<<< HEAD
 # os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs") 
 os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs\check")
+=======
+os.chdir("/Users/cilab/PartTime_PythonAnalysis/group/outputs") 
+# os.chdir(r"C:\Users\Naichen\Documents\GitHub\stu00608.github.io\PartTime_PythonAnalysis\group\outputs")
+>>>>>>> 1a16856f50090c40545f685693ebf9ea898d5163
 
 
 
